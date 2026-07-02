@@ -1,0 +1,140 @@
+# site.config.yaml — the web platform shell config (single source for the marketing core)
+# ----------------------------------------------------------------------------
+# This is the *core/shell* config. Individual apps/landing pages/campaigns drop
+# into apps/<slug>/ with their own app.manifest.json; this file wires them to
+# routes, domains, render targets, and shared concerns. Valid YAML; schema-gated
+# in CI alongside each app.manifest.json (see apps/app.manifest.schema.json).
+#
+# Estate note: the lead wires self/estate.yaml + self/domains.yaml. This file is
+# the *property-local* config for the `marketing-site` property; it must stay
+# consistent with domains.yaml (cogitave.com / www -> marketing-site) and never
+# contradict it.
+# ----------------------------------------------------------------------------
+
+version: 0
+
+property:
+  name: marketing-site                 # matches self/domains.yaml `properties[].name`
+  description: "Cogitave corporate landing + marketing/campaign shell."
+  owner: cogitave/web
+
+# --- Domain mapping ---------------------------------------------------------
+# Mirrors self/domains.yaml (DNS-as-code is canonical there). cogitave.com (apex)
+# and www both resolve to this property. learn.cogitave.com / docs.cogitave.com
+# are a SEPARATE property (learn-platform, built from public/learn) — we only
+# cross-link to it; we never own its routes.
+domains:
+  primary: cogitave.com
+  aliases:
+    - host: www
+      action: redirect                 # canonicalize www -> apex (one canonical origin for SEO)
+      to: cogitave.com
+  related:
+    - host: learn.cogitave.com
+      property: learn-platform
+      relation: cross-link             # owned by public/learn; linked, not routed here
+    - host: docs.cogitave.com
+      property: learn-platform
+      relation: cross-link
+  canonicalOrigin: "https://cogitave.com"
+
+# --- Build / deploy targets -------------------------------------------------
+# Multi-cloud-portable by construction: output is a standard static bundle + a
+# portable edge-function contract (request -> response), so the same artifact
+# deploys to any of the targets below. The renderer is ours (build-from-scratch);
+# the platforms are deploy substrate, not a lock-in.
+build:
+  engine:
+    build: { name: namzu, language: typescript, phase: build }   # produces the static + edge bundle
+    serve: { name: yuva, language: rust, phase: serve }          # edge/runtime serve
+    decoupled: true
+  # Per-route rendering spectrum (2026 hybrid model): static-first, islands for
+  # interactivity, edge SSR only where personalization/freshness demands it.
+  renderModes: [static, island, edge-ssr]
+  defaultRenderMode: static
+  output:
+    static: { dir: "_site/" }          # prerendered HTML + assets (CDN-cacheable)
+    edge:   { dir: "_edge/", contract: "request-response" }  # portable edge handler
+    assets: { dir: "_site/assets/", immutable: true, hashedFilenames: true }
+  designTokens:
+    source: design/tokens.json         # single source; transformed to CSS vars at build
+    format: dtcg                        # W3C Design Tokens Community Group format
+    emit: [css-vars, json]
+  budgets:
+    # Core Web Vitals budgets enforced in CI (perf-first ethos).
+    lcpMs: 2500
+    cls: 0.1
+    inpMs: 200
+    jsKbPerRoute: 120
+
+deploy:
+  strategy: edge-first                 # static at CDN edge; edge-ssr functions co-located
+  multiCloud: true
+  targets:
+    # Provider-agnostic list; selection is an infra concern (internal/infra). Each
+    # consumes the same `build.output` artifact via the portable edge contract.
+    - name: primary
+      kind: edge
+      provider: TBD                    # e.g. an OCI/object-store + edge-compute combo; chosen in infra
+      regionByAudience: true
+    - name: failover
+      kind: static
+      provider: TBD
+  immutableReleases: true              # content-addressed; atomic promote + instant rollback
+  cdn:
+    cacheControl: "public, max-age=0, s-maxage=31536000, stale-while-revalidate=86400"
+    purge: on-merge
+
+# --- Apps registry ----------------------------------------------------------
+# THE SLOT. An app/page/campaign is a folder under apps/ that contains an
+# app.manifest.json. Discovery is automatic (any apps/<slug>/app.manifest.json is
+# picked up); this registry PINS route, property, and status, and is the place to
+# stage/feature-flag a drop-in. Keep entries sorted; one line per app.
+apps:
+  discovery:
+    glob: "apps/*/app.manifest.json"
+    exclude: ["apps/_template/**"]
+  registry:
+    - id: corporate-landing
+      manifest: apps/corporate-landing/app.manifest.json   # author this app to ship the homepage
+      route: "/"
+      property: marketing-site
+      status: planned                   # planned | staged | live | archived
+    # Drop new campaigns/landing pages here, e.g.:
+    # - { id: launch-yuva-2, manifest: apps/launch-yuva-2/app.manifest.json, route: /yuva-2, property: marketing-site, status: staged }
+
+# --- Shared concerns (defaults inherited by every app; an app may override) --
+content:
+  model: content-as-data               # typed, schema-validated YAML; see content/README.md
+  schema: content/schemas/page.schema.json
+  root: apps/*/content
+seo:
+  conventions: seo/README.md
+  sitemap: { generate: true, path: /sitemap.xml }
+  robots: seo/robots.txt
+  structuredData: { format: json-ld, dir: seo/structured-data }
+  llmsTxt: { generate: true, path: /llms.txt }   # curated AI-crawler table of contents
+analytics:
+  provider: privacy-first              # cookieless by default; no PII; see analytics/README.md
+  consent: analytics/consent.config.json
+i18n:
+  defaultLocale: en
+  locales: [en]                        # English-only today; structure is locale-ready
+  strategy: sub-path                   # /<locale>/... when locales > 1
+a11y:
+  standard: WCAG-2.2-AA
+  notes: a11y/README.md
+
+# --- Environment / secrets --------------------------------------------------
+# No secrets in this repo. Config is read from the environment; encrypted values
+# are committed as .env (ciphertext) via dotenvx (ECIES/AES-256), with the private
+# key held only in the deploy secret store — never in git, never in agent context.
+env:
+  loader: dotenvx
+  encryptedFile: .env                  # committed as ciphertext (safe to commit)
+  publicKeyVar: DOTENV_PUBLIC_KEY      # in-repo, encrypts
+  privateKeyVar: DOTENV_PRIVATE_KEY    # injected at deploy from the secret store only
+  vars:
+    - { name: SITE_BASE_URL, required: true, example: "https://cogitave.com" }
+    - { name: ANALYTICS_INGEST_URL, required: false, secret: false }
+    - { name: ANALYTICS_API_KEY, required: false, secret: true }

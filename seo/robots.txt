@@ -1,0 +1,30 @@
+# robots.txt — TEMPLATE for the marketing-site property (served at the origin root).
+# This is the build-time source; the deployed file is emitted to / per site.config.yaml.
+# In 2026, robots.txt is also where you decide which AI crawlers may read the site.
+# Replace SITE_BASE_URL at build from env (dotenvx). English only.
+
+# --- General crawlers -------------------------------------------------------
+User-agent: *
+Allow: /
+Disallow: /_template/        # the drop-in app template never ships to indexes
+
+# --- AI / LLM crawlers ------------------------------------------------------
+# We WELCOME well-behaved AI crawlers for discoverability (we also publish a
+# curated /llms.txt). Tighten or block specific agents here as policy evolves.
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+# --- Canonical discovery ----------------------------------------------------
+Sitemap: https://cogitave.com/sitemap.xml

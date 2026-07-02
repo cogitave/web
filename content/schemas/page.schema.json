@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cogitave.com/schema/page.schema.json",
+  "title": "Cogitave marketing Page (content-as-data)",
+  "description": "Structured content model for a marketing page. Mirrors the docs/learn model: a typed document (first line `### YamlMime:Page` in the .yml), front-matter-style metadata, UID identity, and prose modeled as DATA (semantic blocks) — never as layout. The block `type` carries meaning; how it renders is a /components concern. This is what makes content portable to web, AI answers, and other channels.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["uid", "title", "description", "blocks"],
+  "properties": {
+    "uid": {
+      "type": "string",
+      "pattern": "^cogitave\\.web\\.[a-z0-9-]+(\\.[a-z0-9-]+)*$",
+      "description": "Immutable dotted UID, e.g. cogitave.web.page.home. Identity is decoupled from route/path."
+    },
+    "title": { "type": "string", "minLength": 2 },
+    "description": { "type": "string", "minLength": 75, "maxLength": 300, "description": "75-300 chars (same window as the docs standard); used as the default meta description." },
+    "locale": { "type": "string", "default": "en" },
+    "seo": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "metaTitle": { "type": "string" },
+        "metaDescription": { "type": "string", "maxLength": 300 },
+        "ogImage": { "type": "string" },
+        "canonical": { "type": "string" },
+        "structuredData": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "blocks": {
+      "type": "array",
+      "description": "Ordered semantic content blocks. Each references a component by `type`; content is data.",
+      "items": {
+        "type": "object",
+        "required": ["type"],
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Semantic block type, resolved to a shared component, e.g. hero | feature-grid | logo-wall | testimonial | cta | faq | rich-text.",
+            "examples": ["hero", "feature-grid", "cta", "faq", "rich-text"]
+          },
+          "id": { "type": "string", "description": "Optional in-page anchor id." },
+          "data": { "type": "object", "description": "Block-specific fields validated by the component's own sub-schema (registered in /components)." },
+          "include": { "type": "string", "description": "Optional path to a separate .md prose file (prose lives apart from the data, as in the docs `includes/` convention)." }
+        },
+        "additionalProperties": false
+      }
+    }
+  }
+}

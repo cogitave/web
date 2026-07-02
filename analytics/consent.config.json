@@ -1,0 +1,45 @@
+{
+  "$schema": "https://cogitave.com/schema/consent.config.schema.json",
+  "version": 0,
+  "comment": "Privacy-respecting analytics config for the marketing shell. Default-deny: nothing that identifies a visitor runs before opt-in. Baseline measurement is cookieless and aggregate (no cookies, no cross-site identifiers, no PII) so it needs NO consent banner; only the optional `marketing` category requires consent. Equal-prominence accept/reject is mandatory (2026 consent law). Server-side ingest is preferred to survive ad-blockers without tracking the user.",
+  "model": {
+    "defaultState": "deny",
+    "equalProminence": true,
+    "rejectAsEasyAsAccept": true,
+    "respectGlobalPrivacyControl": true,
+    "respectDoNotTrack": true,
+    "consentLogRetentionDays": 365
+  },
+  "categories": [
+    {
+      "id": "essential",
+      "label": "Essential",
+      "required": true,
+      "consentRequired": false,
+      "description": "Strictly necessary for the site to function (e.g. CDN, security). No tracking."
+    },
+    {
+      "id": "analytics",
+      "label": "Anonymous analytics",
+      "required": false,
+      "consentRequired": false,
+      "description": "Cookieless, aggregate page/section metrics. No cookies, no cross-site IDs, no PII; not joinable to an individual — runs without a banner.",
+      "cookieless": true,
+      "pii": false
+    },
+    {
+      "id": "marketing",
+      "label": "Marketing",
+      "required": false,
+      "consentRequired": true,
+      "default": false,
+      "description": "Campaign attribution / remarketing signals. OFF until explicit opt-in; gated behind consent."
+    }
+  ],
+  "transport": {
+    "mode": "server-side",
+    "endpointVar": "ANALYTICS_INGEST_URL",
+    "comment": "First-party, server-side ingest endpoint. Recovers lost signal without browser fingerprinting; events are validated against the per-app `analytics.events` allowlist in app.manifest.json."
+  },
+  "doNotCollect": ["ip-raw", "email", "name", "precise-geolocation", "device-fingerprint"]
+}

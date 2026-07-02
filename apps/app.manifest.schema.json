@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cogitave.com/schema/app.manifest.schema.json",
+  "title": "Cogitave web app manifest",
+  "description": "The drop-in slot contract. Every app/landing-page/campaign under apps/<slug>/ declares one app.manifest.json. The schema VALIDATES and INTERPRETS (mirrors the docs Schema-DSL approach): CI fails on a manifest that does not validate (blocking gate). Adding an app == adding a folder with a valid manifest + content; no shell code changes.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "kind", "title", "route", "property", "render", "content", "owner", "status"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$",
+      "description": "Stable kebab-case id. Immutable once live; the route may change, the id does not."
+    },
+    "kind": {
+      "enum": ["app", "landing", "campaign"],
+      "description": "app = multi-route experience; landing = single marketing page; campaign = time-boxed page (has `schedule`)."
+    },
+    "title": { "type": "string", "minLength": 2 },
+    "description": { "type": "string", "minLength": 0, "maxLength": 300 },
+    "route": {
+      "type": "string",
+      "pattern": "^/",
+      "description": "Mount path under the property origin, e.g. \"/\" or \"/yuva-2\". Must be unique across apps; CI checks for collisions."
+    },
+    "property": {
+      "type": "string",
+      "description": "Deploy property; must equal a properties[].name in self/domains.yaml (today: marketing-site).",
+      "default": "marketing-site"
+    },
+    "render": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode"],
+      "properties": {
+        "mode": { "enum": ["static", "island", "edge-ssr"], "description": "Per-app rendering mode on the 2026 hybrid spectrum. Prefer static; escalate only when needed." },
+        "revalidateSeconds": { "type": "integer", "minimum": 0, "description": "Incremental re-render window for static/island content." }
+      }
+    },
+    "content": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["root"],
+      "properties": {
+        "root": { "type": "string", "description": "Content-as-data root for this app, e.g. \"content/\". Documents validate against content/schemas/page.schema.json." },
+        "entry": { "type": "string", "description": "Entry document relative to root.", "default": "index.page.yaml" }
+      }
+    },
+    "components": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Shared component ids consumed from /components. The shell resolves these; an app does not ship its own copies."
+    },
+    "seo": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "noindex": { "type": "boolean", "default": false },
+        "canonical": { "type": "string" },
+        "structuredData": { "type": "array", "items": { "type": "string" }, "description": "JSON-LD ids from seo/structured-data/ to embed." }
+      }
+    },
+    "i18n": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "locales": { "type": "array", "items": { "type": "string" }, "default": ["en"] }
+      }
+    },
+    "analytics": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "events": { "type": "array", "items": { "type": "string" }, "description": "Declared, privacy-safe event names (no PII). Fired only after consent for the relevant category." }
+      }
+    },
+    "schedule": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "For kind=campaign: publish/retire window (ISO-8601).",
+      "properties": {
+        "start": { "type": "string", "format": "date-time" },
+        "end": { "type": "string", "format": "date-time" }
+      }
+    },
+    "owner": { "type": "string", "description": "Owning team, e.g. cogitave/web." },
+    "status": { "enum": ["planned", "staged", "live", "archived"] }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "$schema": "../app.manifest.schema.json",
+  "id": "template",
+  "kind": "landing",
+  "title": "Template app",
+  "description": "Copy this folder to apps/<your-app>/, then edit this manifest and the content/ documents. This stub is excluded from discovery and never deploys.",
+  "route": "/_template",
+  "property": "marketing-site",
+  "render": { "mode": "static" },
+  "content": { "root": "content/", "entry": "index.page.yaml" },
+  "components": ["hero", "feature-grid", "cta"],
+  "seo": {
+    "noindex": true,
+    "structuredData": ["organization"]
+  },
+  "i18n": { "locales": ["en"] },
+  "analytics": { "events": ["cta_click"] },
+  "owner": "cogitave/web",
+  "status": "planned"
+}

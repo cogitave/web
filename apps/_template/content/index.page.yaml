@@ -1,0 +1,36 @@
+### YamlMime:Page
+# Typed content-as-data document. The first line is the type discriminator
+# (same convention as the docs/learn YamlMime types); a single validator
+# dispatches on it and validates against content/schemas/page.schema.json.
+# Prose is modeled as DATA (semantic blocks), not layout. Copy + edit.
+uid: cogitave.web.page.template
+title: Template page
+description: A starter content-as-data page demonstrating the block model — copy this file into your app's content root and replace every block with real, structured marketing content.
+locale: en
+seo:
+  metaTitle: Template page — Cogitave
+  metaDescription: Starter page for the Cogitave web shell.
+  structuredData:
+    - organization
+blocks:
+  - type: hero
+    id: top
+    data:
+      eyebrow: Agent-native platform
+      headline: The operating system and kernel for agents
+      subhead: Built from scratch, vertically integrated, MCP-native.
+      primaryCta: { label: Explore yuva, href: https://github.com/cogitave/yuva }
+      secondaryCta: { label: Learn, href: https://learn.cogitave.com }
+  - type: feature-grid
+    data:
+      items:
+        - { title: yuva, body: "Agent Operating System (Rust).", href: https://github.com/cogitave/yuva }
+        - { title: namzu, body: "Agent Kernel (TypeScript).", href: https://github.com/cogitave/namzu }
+  - type: rich-text
+    # Longer prose is kept in a separate .md (docs `includes/` convention),
+    # so the data stays clean and the prose stays reviewable/translatable.
+    include: ./includes/overview.md
+  - type: cta
+    data:
+      headline: Start building with agents
+      cta: { label: Read the docs, href: https://learn.cogitave.com }

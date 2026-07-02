@@ -1,0 +1,23 @@
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "@id": "https://cogitave.com/#organization",
+  "name": "Cogitave",
+  "url": "https://cogitave.com",
+  "description": "Cogitave builds the foundational, AI-native platform that agents run on — an Agent Operating System (yuva) and an Agent Kernel (namzu) — from scratch, vertically integrated, in the open.",
+  "slogan": "The operating system and kernel for agents.",
+  "sameAs": [
+    "https://github.com/cogitave"
+  ],
+  "knowsAbout": [
+    "Agent operating systems",
+    "AI agents",
+    "Model Context Protocol"
+  ],
+  "subjectOf": {
+    "@type": "WebSite",
+    "@id": "https://cogitave.com/#website",
+    "url": "https://cogitave.com",
+    "name": "Cogitave"
+  }
+}
