@@ -36,7 +36,7 @@ Act point to (EN 301 549 is being updated to reference WCAG 2.2).[^a11y]
 
 - Automated axe-class checks per route (contrast, roles, names, landmarks).
 - Token-contrast check on the semantic pairs in
-  [`design/tokens.json`](../design/tokens.json).
+  [`design/tokens.json`](../../design/tokens.json).
 - Alt-text presence on content images (blocking).
 
 ## Scope note

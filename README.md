@@ -95,7 +95,7 @@ Full walkthrough: [`docs/adding-an-app.md`](docs/adding-an-app.md).
 | [`apps/`](apps/) | Drop-in apps / landing pages / campaigns. `_template/` to copy; `app.manifest.schema.json` is the slot contract. |
 | [`components/`](components/) | Shared, token-driven UI; each component owns a content sub-schema. |
 | [`content/`](content/) | Content-as-data model + schemas (sourced like the docs/learn model). |
-| [`design/`](design/) | Design tokens ([`tokens.json`](design/tokens.json), DTCG) + brand usage — the design-system single source. |
+| [`design/`](design/) | Design tokens ([`tokens.json`](../design/tokens.json), DTCG) + brand usage — the design-system single source. |
 | [`seo/`](seo/) | Metadata, sitemap, `robots.txt`, structured data (JSON-LD), `llms.txt`. |
 | [`analytics/`](analytics/) | Privacy-respecting, consent-gated analytics ([`consent.config.json`](analytics/consent.config.json)). |
 | [`i18n/`](i18n/) | Localization conventions (English-only today, locale-ready). |

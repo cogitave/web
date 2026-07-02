@@ -35,7 +35,7 @@ Each component `components/<type>/` is expected to provide:
 ## Rules
 
 - **Tokens only.** No literal colors/spacing/type; consume `semantic.*` from
-  [`design/tokens.json`](../design/tokens.json).
+  [`design/tokens.json`](../../design/tokens.json).
 - **Accessible by construction.** Semantic HTML, keyboard operable, visible focus,
   contrast within tokens — see [`a11y/`](../a11y/).
 - **Content from data.** A component renders the block `data`; it never embeds
