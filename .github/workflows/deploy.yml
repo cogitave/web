@@ -109,9 +109,18 @@ jobs:
         run: |
           set -euo pipefail
 
-          projects=$(curl -sS -f \
+          # No `curl -f`: it swallows the response body, which is where Cloudflare
+          # puts the reason. Read the API's own success flag instead and surface
+          # its message - the errors are about the request, not about the
+          # account's contents, so they are safe to print in a public log.
+          projects=$(curl -sS \
             -H "Authorization: Bearer $CF_API_TOKEN" \
-            "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/pages/projects?per_page=100")
+            "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/pages/projects")
+
+          if [ "$(printf '%s' "$projects" | jq -r '.success // false')" != "true" ]; then
+            echo "::error::the Cloudflare API refused the project listing: $(printf '%s' "$projects" | jq -rc '[.errors[]? | "\(.code): \(.message)"] | join("; ")')"
+            exit 1
+          fi
 
           # The project whose custom domains include the site domain.
           name=$(printf '%s' "$projects" \
