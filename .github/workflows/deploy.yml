@@ -68,6 +68,21 @@ jobs:
           fi
           echo "every registered app is live"
 
+      # Fail with the reason rather than with wrangler's "authentication error".
+      # A deploy that cannot run because it was never configured should say so in
+      # one line, not send someone reading provider docs.
+      - name: Credentials are configured
+        run: |
+          missing=""
+          [ -n "${{ secrets.CLOUDFLARE_API_TOKEN }}" ] || missing="$missing\n  secret   CLOUDFLARE_API_TOKEN    (scope: Cloudflare Pages -> Edit)"
+          [ -n "${{ secrets.CLOUDFLARE_ACCOUNT_ID }}" ] || missing="$missing\n  secret   CLOUDFLARE_ACCOUNT_ID   (Cloudflare account id)"
+          if [ -n "$missing" ]; then
+            echo "::error::deploy is not configured yet. Add these under Settings -> Secrets and variables -> Actions:$(printf "$missing")"
+            echo "Nothing was deployed. Add them, then re-run this workflow (Actions -> deploy -> Run workflow)."
+            exit 1
+          fi
+          echo "credentials present"
+
       - name: Publish to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:
