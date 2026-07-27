@@ -72,13 +72,21 @@ jobs:
       # A deploy that cannot run because it was never configured should say so in
       # one line, not send someone reading provider docs.
       - name: Credentials are configured
+        env:
+          HAS_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}
+          HAS_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID != '' }}
         run: |
-          missing=""
-          [ -n "${{ secrets.CLOUDFLARE_API_TOKEN }}" ] || missing="$missing\n  secret   CLOUDFLARE_API_TOKEN    (scope: Cloudflare Pages -> Edit)"
-          [ -n "${{ secrets.CLOUDFLARE_ACCOUNT_ID }}" ] || missing="$missing\n  secret   CLOUDFLARE_ACCOUNT_ID   (Cloudflare account id)"
-          if [ -n "$missing" ]; then
-            echo "::error::deploy is not configured yet. Add these under Settings -> Secrets and variables -> Actions:$(printf "$missing")"
-            echo "Nothing was deployed. Add them, then re-run this workflow (Actions -> deploy -> Run workflow)."
+          missing=0
+          if [ "$HAS_TOKEN" != "true" ]; then
+            echo "  MISSING  secret   CLOUDFLARE_API_TOKEN   — scope it to Cloudflare Pages -> Edit, nothing else"
+            missing=1
+          fi
+          if [ "$HAS_ACCOUNT" != "true" ]; then
+            echo "  MISSING  secret   CLOUDFLARE_ACCOUNT_ID  — the Cloudflare account id"
+            missing=1
+          fi
+          if [ "$missing" = "1" ]; then
+            echo "::error::deploy is not configured. Add the secrets listed above under Settings -> Secrets and variables -> Actions, then re-run: Actions -> deploy -> Run workflow. Nothing was deployed."
             exit 1
           fi
           echo "credentials present"
