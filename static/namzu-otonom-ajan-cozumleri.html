@@ -1,0 +1,1965 @@
+﻿<!DOCTYPE html>
+<html lang="tr" class="js">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cogitave · namzu ile Otonom Ajan Çözümleri</title>
+<meta name="description" content="Cogitave müşteri sunumu: açık kaynak agent kernel namzu ile otonom ajan çözümleri. Sandbox izolasyonu, bütçe kapıları, insan onaylı akışlar ve denetim izi.">
+<meta name="theme-color" content="#0a0a0f">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Cogitave">
+<meta property="og:title" content="Cogitave · namzu ile Otonom Ajan Çözümleri">
+<meta property="og:description" content="Süreçleriniz kendini yürütsün; kontrol sizde kalsın. 18 slaytlık sunum.">
+<meta property="og:url" content="https://cogitave.com/namzu-otonom-ajan-cozumleri">
+<meta property="og:image" content="https://cogitave.com/sunum-og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=Space+Grotesk:wght@700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/animejs@4.0.2/lib/anime.iife.min.js" defer></script>
+<style>
+  /* ============================================================
+     Cogitave — yapısal / karesel premium tasarım sistemi
+     (marketing sitesiyle aynı token'lar)
+     ============================================================ */
+  :root {
+    --ink: #0a0a0f;
+    --text: #ecebe4;
+    --text-dim: rgba(236, 235, 228, 0.58);
+    --text-faint: rgba(236, 235, 228, 0.34);
+    --bone: #e6e2d4; /* tek vurgu rengi — fildişi */
+
+    --line: rgba(255, 255, 255, 0.1);
+    --line-soft: rgba(255, 255, 255, 0.06);
+
+    --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+
+    --font-display: "Inter Tight", system-ui, sans-serif;
+    --font-body: "Inter", system-ui, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+    --pad: clamp(20px, 3.4vw, 56px);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+
+  body {
+    background: var(--ink);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.5;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection { background: rgba(236, 235, 228, 0.25); }
+
+  .mono {
+    font-family: var(--font-mono);
+    font-weight: 400;
+    letter-spacing: 0.08em;
+  }
+
+  /* i18n */
+  body.lang-tr .en { display: none !important; }
+  body.lang-en .tr { display: none !important; }
+
+  /* ------------------------------------------------ arka plan */
+  #gl {
+    position: fixed; inset: 0; width: 100%; height: 100%;
+    z-index: 0;
+    image-rendering: pixelated; /* dither noktaları büyütmede keskin kalsın */
+  }
+  /* WebGL yoksa: statik monokrom degrade yedeği */
+  body.no-gl {
+    background:
+      radial-gradient(900px 560px at 78% -8%, rgba(236, 235, 228, 0.07), transparent 60%),
+      radial-gradient(700px 520px at -8% 108%, rgba(236, 235, 228, 0.04), transparent 60%),
+      var(--ink);
+  }
+  .grain {
+    position: fixed; inset: 0; z-index: 1; pointer-events: none;
+    opacity: 0.045;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ------------------------------------------------ çerçeve */
+  .frame {
+    position: relative; z-index: 10;
+    height: 100svh;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+  }
+
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between; gap: 24px;
+    padding: 0 var(--pad); height: 64px;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .logo {
+    color: var(--text); text-decoration: none;
+    font-family: "Space Grotesk", var(--font-display);
+    font-weight: 700; font-size: 19px; letter-spacing: -0.03em;
+  }
+  .top-meta { font-size: 10px; color: var(--text-faint); }
+
+  .bottombar {
+    display: flex; align-items: center; justify-content: space-between; gap: 18px;
+    padding: 0 var(--pad); height: 60px;
+    border-top: 1px solid var(--line-soft);
+  }
+  .bb-copy { font-size: 10px; color: var(--text-faint); }
+
+  /* köşe artıları */
+  .cross { position: absolute; width: 13px; height: 13px; pointer-events: none; z-index: 5; }
+  .cross::before, .cross::after { content: ""; position: absolute; background: rgba(255, 255, 255, 0.22); }
+  .cross::before { left: 6px; top: 0; width: 1px; height: 13px; }
+  .cross::after { left: 0; top: 6px; width: 13px; height: 1px; }
+  .cross-tl { top: 18px; left: calc(var(--pad) - 6px); }
+  .cross-tr { top: 18px; right: calc(var(--pad) - 6px); }
+  .cross-bl { bottom: 18px; left: calc(var(--pad) - 6px); }
+  .cross-br { bottom: 18px; right: calc(var(--pad) - 6px); }
+
+  /* ------------------------------------------------ sahne / slaytlar */
+  .stage { position: relative; min-height: 0; }
+
+  .slide {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; justify-content: center;
+    justify-content: safe center; /* taşan içerik köşe artılarının altına kaymasın */
+    padding: clamp(40px, 6vh, 60px) var(--pad);
+    opacity: 0; visibility: hidden; transform: translateY(12px);
+    transition: opacity 420ms var(--ease-out), transform 420ms var(--ease-out), visibility 420ms;
+    overflow: hidden;
+  }
+  .slide.active { opacity: 1; visibility: visible; transform: translateY(0); }
+
+  .kicker {
+    font-size: 10px; color: var(--text-faint);
+    margin-bottom: 20px;
+  }
+  .kicker b { color: var(--bone); font-weight: 500; }
+
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(30px, 4.6vw, 58px);
+    letter-spacing: -0.025em; line-height: 1.1;
+  }
+  h2 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(24px, 3.2vw, 40px);
+    letter-spacing: -0.02em; line-height: 1.12;
+    margin-bottom: 14px;
+  }
+  .accent { color: var(--bone); }
+
+  .lede {
+    font-size: clamp(13.5px, 1.35vw, 16px);
+    line-height: 1.7; color: var(--text-dim);
+    max-width: 62ch; margin-top: 12px;
+  }
+
+  /* ------------------------------------------------ ızgaralar */
+  .grid { display: grid; gap: 1px; background: var(--line-soft); border: 1px solid var(--line-soft); margin-top: 30px; }
+  .g3 { grid-template-columns: repeat(3, 1fr); }
+  .g4 { grid-template-columns: repeat(4, 1fr); }
+  @media (max-width: 900px) { .g3, .g4 { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 600px) { .g3, .g4 { grid-template-columns: 1fr; } }
+
+  .cell {
+    background: var(--ink);
+    padding: 22px 22px 20px;
+    transition: background-color 240ms var(--ease-out);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .cell:hover { background: #101018; }
+  }
+  .cell .no { font-size: 9.5px; color: var(--text-faint); display: block; margin-bottom: 12px; }
+  .cell h3 {
+    font-family: var(--font-display);
+    font-size: 15px; font-weight: 600; letter-spacing: -0.01em;
+    margin-bottom: 7px;
+  }
+  .cell p { font-size: 12.5px; line-height: 1.65; color: var(--text-dim); }
+
+  /* ------------------------------------------------ stat bandı (prod-stat) */
+  .statband { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--line-soft); border: 1px solid var(--line-soft); margin-top: 30px; }
+  @media (max-width: 900px) { .statband { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 600px) { .statband { grid-template-columns: 1fr; } }
+  .stat {
+    background: var(--ink);
+    padding: 24px 22px;
+    background-image: linear-gradient(90deg, rgba(236, 235, 228, 0.04), transparent 85%);
+  }
+  .stat b {
+    font-family: var(--font-mono); font-weight: 500;
+    font-size: clamp(26px, 2.6vw, 36px); line-height: 1;
+    letter-spacing: -0.02em; color: var(--bone);
+    display: block;
+  }
+  .stat .lab {
+    font-family: var(--font-display);
+    font-size: 13px; font-weight: 600; letter-spacing: -0.01em;
+    margin-top: 12px;
+  }
+  .stat .sub { font-size: 11.5px; color: var(--text-dim); margin-top: 6px; line-height: 1.55; }
+
+  /* ------------------------------------------------ karşılaştırma barları */
+  .bar-row { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+  .bar-lab { font-size: 8.5px; letter-spacing: 0.1em; color: var(--text-faint); }
+  .bar-track {
+    position: relative; height: 26px;
+    border: 1px solid var(--line-soft);
+    background: rgba(255, 255, 255, 0.02);
+  }
+  .bar-fill { position: absolute; left: 0; top: 0; bottom: 0; }
+  .bar-dim { background: rgba(236, 235, 228, 0.22); }
+  .bar-hot { background: var(--bone); min-width: 4px; }
+  .bar-val {
+    position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+    font-size: 11.5px; color: var(--text); letter-spacing: 0.04em;
+  }
+  .fine { font-size: 10px; color: var(--text-faint); line-height: 1.6; margin-top: 12px; max-width: 62ch; }
+
+  /* ------------------------------------------------ vurgu kutusu */
+  .callout {
+    margin-top: 14px;
+    padding: 15px 20px;
+    border: 1px solid var(--line-soft);
+    background: linear-gradient(90deg, rgba(236, 235, 228, 0.06), transparent 80%);
+    box-shadow: inset 2px 0 0 var(--bone);
+    font-size: 12.5px; line-height: 1.65; color: var(--text-dim);
+    max-width: 100ch;
+  }
+  .callout b { color: var(--text); font-weight: 600; }
+  .callout .tag-mono { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.1em; color: var(--bone); margin-right: 10px; }
+
+  /* ------------------------------------------------ ürün kartları (site .prod-card) */
+  .prodgrid { display: grid; grid-template-columns: repeat(3, 1fr); margin-top: 26px; border-top: 1px solid var(--line-soft); border-bottom: 1px solid var(--line-soft); }
+  @media (max-width: 900px) { .prodgrid { grid-template-columns: 1fr; } }
+  .prod-card {
+    display: flex; flex-direction: column; align-items: flex-start; gap: 13px;
+    padding: clamp(20px, 3.4vh, 38px) clamp(18px, 2.2vw, 36px);
+    border-left: 1px solid var(--line-soft);
+    transition: background-color 300ms var(--ease-out);
+  }
+  .prod-card:first-child { border-left: 0; }
+  @media (max-width: 900px) {
+    .prod-card { border-left: 0; border-top: 1px solid var(--line-soft); }
+    .prod-card:first-child { border-top: 0; }
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .prod-card:hover { background: linear-gradient(180deg, rgba(236, 235, 228, 0.03), transparent 70%); }
+  }
+  .prod-no { font-size: 9.5px; color: var(--text-faint); }
+  .prod-name {
+    font-family: var(--font-mono); font-weight: 500;
+    font-size: clamp(1.8rem, 2.8vw, 2.8rem);
+    letter-spacing: -0.04em; line-height: 1;
+  }
+  .prod-slogan { font-family: var(--font-mono); font-size: 11.5px; letter-spacing: 0.02em; color: var(--bone); }
+  .prod-slogan::before { content: "// "; color: var(--text-faint); }
+  .prod-desc { font-size: 12px; line-height: 1.65; color: var(--text-dim); max-width: 40ch; }
+  .prod-stat {
+    display: flex; align-items: center; gap: 12px; width: 100%;
+    min-height: 44px; padding: 9px 13px;
+    border: 1px solid var(--line-soft);
+    background: linear-gradient(90deg, rgba(236, 235, 228, 0.05), transparent 85%);
+  }
+  .prod-stat b {
+    font-family: var(--font-mono); font-weight: 500; font-size: 19px; line-height: 1;
+    min-width: 34px; color: var(--bone); flex: none;
+  }
+  .prod-stat span { font-size: 8px; letter-spacing: 0.1em; color: var(--text-dim); }
+  .prod-tag { font-size: 9px; padding: 4px 8px; border: 1px solid var(--line); color: var(--text-dim); }
+  .prod-tag.hot { background: var(--bone); border-color: var(--bone); color: #0a0a0f; }
+
+  /* ------------------------------------------------ satır listesi (site .dv-row) */
+  .rows { margin-top: 26px; border-top: 1px solid var(--line-soft); }
+  .rows-2 {
+    display: grid; grid-template-columns: 1fr 1fr;
+    column-gap: clamp(24px, 3vw, 56px);
+  }
+  @media (max-width: 900px) { .rows-2 { grid-template-columns: 1fr; } }
+  .row {
+    display: flex; align-items: baseline; gap: clamp(14px, 2vw, 28px);
+    padding: clamp(11px, 1.9vh, 17px) 4px;
+    border-bottom: 1px solid var(--line-soft);
+    transition: padding-left 240ms var(--ease-out), background-color 240ms var(--ease-out);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .row:hover { padding-left: 14px; background: linear-gradient(90deg, rgba(236, 235, 228, 0.04), transparent 75%); }
+    .row:hover .row-no { color: var(--bone); }
+  }
+  .row-no { font-size: 10px; color: var(--text-faint); flex: none; transition: color 200ms var(--ease-out); }
+  .row-main { flex: 1; min-width: 0; }
+  .row-main b {
+    font-family: var(--font-display); font-size: clamp(13.5px, 1.35vw, 16px);
+    font-weight: 600; letter-spacing: -0.01em; display: block;
+  }
+  .row-main small { font-size: 11.5px; line-height: 1.55; color: var(--text-dim); display: block; margin-top: 3px; }
+  .row-side { font-size: 9px; letter-spacing: 0.1em; color: var(--text-faint); flex: none; }
+
+  /* ------------------------------------------------ katman şeması */
+  .layers { display: flex; flex-direction: column; gap: 1px; background: var(--line-soft); border: 1px solid var(--line-soft); }
+  .layer {
+    background: var(--ink);
+    padding: 13px 18px;
+    display: flex; justify-content: space-between; align-items: center; gap: 14px;
+    font-family: var(--font-display); font-size: 12.5px; font-weight: 600; letter-spacing: 0.02em;
+    color: var(--text-dim);
+  }
+  .layer small { font-family: var(--font-mono); font-weight: 400; font-size: 8.5px; letter-spacing: 0.08em; color: var(--text-faint); text-align: right; }
+  .layer.hot {
+    background: linear-gradient(90deg, rgba(236, 235, 228, 0.09), var(--ink) 70%);
+    color: var(--text);
+    box-shadow: inset 2px 0 0 var(--bone);
+  }
+  .layer.hot small { color: var(--bone); }
+
+  /* ------------------------------------------------ kapak */
+  .two-col { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: clamp(24px, 4vw, 72px); align-items: center; }
+  @media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
+
+  /* composing orb — thinking-orbs (MIT, © 2026 Jakub Antalik), 2D canvas */
+  .cover-col { grid-template-columns: 0.9fr 1.1fr; }
+  .orb-col { display: flex; align-items: center; justify-content: center; }
+  #orb {
+    width: clamp(260px, 30vw, 400px);
+    height: clamp(260px, 30vw, 400px);
+    display: block;
+  }
+
+  .typeline {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    font-size: clamp(1.55rem, 3vw, 2.7rem);
+    letter-spacing: -0.02em; line-height: 1.32;
+    min-height: 2.7em;
+  }
+  .type-prompt { color: var(--text-faint); user-select: none; }
+  .type-cursor {
+    display: inline-block; width: 0.52em; height: 1.05em; margin-left: 0.12em;
+    background: var(--bone); transform: translateY(0.16em);
+    animation: cursor-blink 1.1s steps(2, jump-none) infinite;
+  }
+  @keyframes cursor-blink { 50% { opacity: 0; } }
+
+  .chips { margin-top: 26px; display: flex; gap: 8px; flex-wrap: wrap; }
+  .chip {
+    font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.08em;
+    color: var(--text-dim);
+    border: 1px solid var(--line); padding: 7px 12px;
+    user-select: none;
+  }
+  .chip.hot { background: var(--bone); border-color: var(--bone); color: #0a0a0f; }
+
+  /* ------------------------------------------------ butonlar — karesel */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+    border: 0; cursor: pointer;
+    font-family: var(--font-display); font-weight: 600;
+    text-decoration: none; border-radius: 0;
+    transition: transform 140ms var(--ease-out), background-color 180ms var(--ease-out),
+      color 180ms var(--ease-out), border-color 180ms var(--ease-out), box-shadow 220ms var(--ease-out);
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn svg { width: 14px; height: 14px; transition: transform 220ms var(--ease-out); }
+  .btn-primary { font-size: 14.5px; padding: 15px 26px; color: #0b0a12; background: var(--text); }
+  @media (hover: hover) and (pointer: fine) {
+    .btn-primary:hover { box-shadow: 0 0 30px rgba(236, 235, 228, 0.3); }
+    .btn-primary:hover svg { transform: translateX(3px); }
+  }
+  .btn-ghost { font-size: 13px; padding: 13px 20px; color: var(--text); background: transparent; border: 1px solid var(--line); }
+  @media (hover: hover) and (pointer: fine) {
+    .btn-ghost:hover { background: rgba(255, 255, 255, 0.07); border-color: rgba(255, 255, 255, 0.24); }
+  }
+
+  .cta-box { margin-top: 34px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+  .cta-links { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 22px; font-size: 11px; }
+  .cta-links a, .cta-links span { color: var(--text-dim); text-decoration: none; transition: color 160ms var(--ease-out); }
+  .cta-links a:hover { color: var(--bone); }
+
+  /* ------------------------------------------------ gezinme (alt bar içinde) */
+  .navgrp { display: flex; align-items: center; gap: 8px; }
+  .nbtn, .lang {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--line);
+    color: var(--text-dim);
+    cursor: pointer; border-radius: 0;
+    font-family: var(--font-mono);
+    transition: color 160ms var(--ease-out), background-color 160ms var(--ease-out), border-color 160ms var(--ease-out);
+  }
+  .nbtn { height: 36px; padding: 0 14px; font-size: 10.5px; letter-spacing: 0.08em; }
+  .lang { height: 36px; padding: 0 13px; font-size: 10.5px; letter-spacing: 0.08em; }
+  @media (hover: hover) and (pointer: fine) {
+    .nbtn:hover, .lang:hover { color: var(--text); border-color: rgba(255, 255, 255, 0.24); background: rgba(255, 255, 255, 0.07); }
+  }
+  .counter { font-size: 10px; color: var(--text-faint); min-width: 52px; text-align: center; font-variant-numeric: tabular-nums; }
+
+  .dots { display: flex; gap: 10px; }
+  .dot {
+    width: 8px; height: 8px; padding: 0; border: 1px solid var(--line);
+    background: transparent; cursor: pointer; border-radius: 0;
+    transition: background-color 200ms var(--ease-out), border-color 200ms var(--ease-out), transform 200ms var(--ease-out);
+  }
+  .dot.on { background: var(--bone); border-color: var(--bone); }
+  @media (hover: hover) and (pointer: fine) { .dot:hover { border-color: var(--bone); } }
+
+  .progress { position: fixed; top: 0; left: 0; right: 0; height: 1px; background: transparent; z-index: 20; }
+  .progress i { display: block; height: 100%; background: var(--bone); width: 0; transition: width 420ms var(--ease-out); }
+
+  /* final ekranı: her şey ortada */
+  .center-slide { align-items: center; text-align: center; }
+  .center-slide .kicker { justify-content: center; }
+  .center-slide .lede { margin-left: auto; margin-right: auto; }
+
+  /* kapak sloganı */
+  .cover-slogan {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(19px, 2.1vw, 27px);
+    letter-spacing: -0.02em;
+    line-height: 1.3;
+    margin: 4px 0 18px;
+    max-width: 22ch;
+  }
+
+  /* mimari şema — .layer stilini ok ayraçlarıyla dikey akışa bağlar */
+  .arch { display: flex; flex-direction: column; }
+  .arch .layer { border: 1px solid var(--line-soft); }
+  .arch .layer + .arch-sep { margin: 2px 0; }
+  .arch-sep {
+    text-align: center;
+    font-size: 11px;
+    line-height: 1;
+    color: var(--text-faint);
+    user-select: none;
+  }
+
+  /* tasarım terminal — temsilî namzu çalıştırması */
+  .term {
+    border: 1px solid var(--line-soft);
+    background: #060608;
+    font-size: 11px;
+    letter-spacing: 0.02em;
+  }
+  .term-bar {
+    display: flex; align-items: center; gap: 6px;
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--line-soft);
+    color: var(--text-faint); font-size: 9.5px;
+  }
+  .term-bar i { width: 8px; height: 8px; border-radius: 50%; background: rgba(236, 235, 228, 0.16); }
+  .term-bar span { margin-left: 6px; }
+  .term-body { padding: 14px 16px 16px; min-height: 172px; }
+  .tl {
+    display: flex; justify-content: space-between; gap: 16px;
+    padding: 3px 0;
+    opacity: 0; transform: translateY(4px);
+    transition: opacity 260ms var(--ease-out), transform 260ms var(--ease-out);
+  }
+  .tl.on { opacity: 1; transform: none; }
+  .tl-l { color: var(--text); white-space: nowrap; }
+  .tl-r { color: var(--text-faint); text-align: right; }
+  .tl.cmd .tl-l { color: var(--bone); }
+  .tl.ok .tl-l::first-letter { color: var(--bone); }
+  .tl.wait .tl-r { color: var(--bone); }
+
+  /* metal-fx CTA host'u — gerçek komponent (github.com/Jakubantalik/metal-fx, MIT)
+     butonu sarar ve kenarına canlı metal halka çizer */
+  .mfx-slot { display: inline-flex; }
+  /* karesel: halkanın yuvarlaklığı CSS'ten gelir, tasarım diline eşitle */
+  .mfx-slot .metal-fx-root,
+  .mfx-slot .metal-fx-root * { border-radius: 0 !important; }
+  .mfx-slot .metal-fx-root { background: #000 !important; } /* kök zemini de siyah */
+  .mfx-host {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 16px 34px;
+    border: 0; border-radius: 0;
+    background: #000;
+    color: var(--text);
+    font-family: var(--font-display); font-weight: 600; font-size: 15.5px;
+    letter-spacing: -0.01em; text-decoration: none;
+    cursor: pointer;
+    transition: transform 140ms var(--ease-out);
+  }
+  .mfx-host:active { transform: scale(0.97); }
+  .lang-wrap { display: inline-flex; align-items: center; }
+  .mfx-lang {
+    height: 36px; padding: 0 14px;
+    border: 0; border-radius: 0;
+    background: #000; color: var(--text);
+    font-size: 10.5px; letter-spacing: 0.08em;
+    cursor: pointer;
+    transition: transform 140ms var(--ease-out);
+  }
+  .mfx-lang:active { transform: scale(0.95); }
+
+  /* kurumsal sistemler (ERP) kartları — zeminli, eşit boy, hizalı stat */
+  .erpgrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 22px; }
+  .erp-card {
+    display: flex; flex-direction: column; gap: 10px;
+    padding: 20px 20px 16px;
+    border: 1px solid var(--line-soft);
+    background: rgba(10, 10, 15, 0.62);
+  }
+  .erp-card .prod-no { font-size: 9.5px; color: var(--text-faint); }
+  .erp-name {
+    font-family: var(--font-mono); font-weight: 500;
+    font-size: clamp(1.5rem, 2.2vw, 2.1rem); letter-spacing: -0.03em; line-height: 1;
+  }
+  .erp-card p { font-size: 12px; line-height: 1.6; color: var(--text-dim); }
+  .erp-stat {
+    margin-top: auto; display: flex; align-items: center; gap: 12px;
+    border-top: 1px solid var(--line-soft); padding-top: 12px;
+  }
+  .erp-stat b {
+    font-family: var(--font-mono); font-weight: 500; font-size: 18px;
+    line-height: 1; min-width: 22px; color: var(--bone); flex: none;
+  }
+  .erp-stat span { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.1em; color: var(--text-dim); }
+  @media (max-width: 900px) { .erpgrid { grid-template-columns: 1fr; } }
+
+  /* yoğun slaytlar için sıkıştırma */
+  .dense h2 { margin-bottom: 8px; }
+  .dense .kicker { margin-bottom: 14px; }
+  .dense .lede { margin-top: 8px; font-size: clamp(13px, 1.25vw, 15px); }
+  .dense .rows { margin-top: 12px; }
+  .dense .row { padding-top: 7px; padding-bottom: 7px; }
+  .dense .row-main b { font-size: clamp(12.5px, 1.2vw, 14.5px); }
+  .dense .row-main small { font-size: 10px; margin-top: 2px; line-height: 1.5; }
+  .dense .layer { padding: 11px 16px; }
+  .dense .callout { padding: 12px 16px; margin-top: 10px; }
+  .dense .fine { margin-top: 8px; }
+  .dense .statband { margin-top: 10px; }
+  .dense .bar-row { margin-bottom: 10px; }
+  .dense .cell { padding: 15px 17px 14px; }
+  .dense .cell h3 { font-size: 14px; }
+  .dense .cell p { font-size: 11.5px; }
+  .dense .chip { padding: 6px 10px; font-size: 9px; }
+  .dense .grid { margin-top: 18px; }
+
+  /* ------------------------------------------------ responsive / kısa ekran */
+  @media (max-width: 720px) {
+    body { overflow-y: auto; }
+    .frame { height: auto; min-height: 100svh; padding-top: 68px; }
+    /* üst bar viewport'a sabit — dil düğmesi de burada */
+    .topbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 60;
+      height: 56px;
+      background: rgba(10, 10, 15, 0.96);
+    }
+    .top-meta { display: none; } /* dar ekranda meta sığmıyor; logo + dil kalır */
+    .slide { position: relative; inset: auto; display: none; padding-top: 32px; padding-bottom: 40px; }
+    .slide.active { display: flex; }
+    .cross { display: none; }
+    .dots { display: none; }
+    .bb-copy { display: none; }
+    /* kapak: .cover-col kuralı 900px medyasını eziyordu — mobilde tek kolon */
+    .cover-col { grid-template-columns: 1fr; }
+    .orb-col { order: -1; }
+    #orb { width: 180px; height: 180px; }
+    /* ileri/geri: viewport'a sabit, yarı yarıya iki büyük dokunma alanı */
+    .bottombar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      z-index: 60;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      height: auto;
+      min-height: 58px;
+      padding: 0 0 env(safe-area-inset-bottom);
+      background: rgba(10, 10, 15, 0.96);
+    }
+    .navgrp { display: contents; } /* prev/next doğrudan grid hücresi olur */
+    .nbtn {
+      width: 100%;
+      height: 100%;
+      min-height: 58px;
+      border: 0;
+      border-radius: 0;
+      background: none;
+      font-size: 11px;
+    }
+    #prev { border-right: 1px solid var(--line-soft); }
+    .counter {
+      position: absolute;
+      left: 50%; top: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1;
+      min-width: auto;
+      padding: 3px 9px;
+      background: var(--ink);
+      border: 1px solid var(--line-soft);
+      pointer-events: none;
+    }
+    .frame { padding-bottom: 76px; } /* içerik sabit barın altında kalmasın */
+  }
+  @media (max-width: 600px) {
+    /* inline grid-template-columns stilini de ezmek için !important */
+    .statband { grid-template-columns: 1fr !important; }
+  }
+  /* 768p sınıfı ekranlar: dolgu ve tipografiyi hafif kıs, taşma olmasın */
+  @media (min-width: 721px) and (max-height: 830px) {
+    .row { padding-top: 5px; padding-bottom: 5px; }
+    .rows { margin-top: 10px; }
+    .row-main small { font-size: 10px; line-height: 1.5; }
+    .lede { margin-top: 6px; font-size: clamp(12.5px, 1.2vw, 14px); }
+    h2 { margin-bottom: 8px; }
+    .prodgrid { margin-top: 16px; }
+    .prod-slogan { font-size: 11px; }
+    .prod-desc { font-size: 11px; line-height: 1.55; }
+    .prod-stat { min-height: 42px; padding: 8px 12px; }
+    .grid { margin-top: 16px; }
+    .slide { padding-top: 34px; padding-bottom: 34px; }
+    .lede-optional { display: none; }
+    .rows-2 .row { padding-top: 4px; padding-bottom: 4px; }
+  }
+  @media (max-height: 700px) and (min-width: 721px) {
+    .topbar { height: 54px; }
+    .bottombar { height: 52px; }
+    h2 { margin-bottom: 10px; }
+    .grid, .statband, .rows, .prodgrid { margin-top: 18px; }
+    .cell { padding: 16px 18px 15px; }
+    .stat { padding: 18px 18px; }
+    .lede { margin-top: 8px; }
+  }
+
+  /* son slayt QR */
+  .qr-wrap {
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    margin-top: 26px;
+  }
+  .qr-wrap .qr { display: block; background: var(--bone); padding: 7px; } /* koyu modül + açık zemin: her tarayıcı okur */
+  .qr-cap { font-size: 8.5px; color: var(--text-faint); }
+
+  /* ilk açılış ipucu — kapakta, ilk gezinmede kaybolur */
+  .nav-hint {
+    position: fixed;
+    left: 50%; bottom: 76px;
+    transform: translateX(-50%);
+    z-index: 55;
+    font-size: 9.5px;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+    color: var(--text-faint);
+    border: 1px solid var(--line-soft);
+    background: rgba(10, 10, 15, 0.9);
+    padding: 7px 14px;
+    pointer-events: none;
+    transition: opacity 600ms var(--ease-out);
+  }
+  .nav-hint.off { opacity: 0; }
+  .hint-mob { display: none; }
+  @media (max-width: 720px) {
+    .hint-desk { display: none; }
+    .hint-mob { display: inline; }
+    .nav-hint {
+      bottom: calc(72px + env(safe-area-inset-bottom));
+      font-size: 8.5px;
+      padding: 6px 12px;
+    }
+  }
+
+  /* yazdırma / PDF: tüm slaytlar alt alta, kontroller gizli */
+  @media print {
+    body { overflow: visible !important; background: #0a0a0f !important;
+      -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    #gl, .grain, .progress, .bottombar, .nav-hint, .lang-wrap, .dots, .cross { display: none !important; }
+    .topbar { position: static !important; border-bottom: 1px solid #333; }
+    .frame { height: auto !important; padding: 0 !important; }
+    .slide {
+      position: static !important; inset: auto !important;
+      display: flex !important; opacity: 1 !important; visibility: visible !important;
+      transform: none !important;
+      page-break-after: always; break-after: page;
+      padding: 36px 40px !important;
+    }
+    .lede-optional { display: block !important; }
+    .tl { opacity: 1 !important; transform: none !important; }
+    .term canvas, #mfxRoot canvas { display: none !important; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+  }
+</style>
+</head>
+<body class="lang-tr">
+<canvas id="gl" aria-hidden="true"></canvas>
+<div class="grain" aria-hidden="true"></div>
+<div class="progress" aria-hidden="true"><i id="bar"></i></div>
+
+<div class="frame">
+  <header class="topbar">
+    <span class="logo">cogitave</span>
+    <span class="mono top-meta">
+      <span class="tr">SUNUM · 01 / OTONOM AJAN ÇÖZÜMLERİ</span>
+      <span class="en">DECK · 01 / AUTONOMOUS AGENT SOLUTIONS</span>
+    </span>
+    <span class="lang-wrap">
+      <button class="lang mono" id="langBtn" aria-label="Language">EN</button>
+      <span id="mfxLang" class="mfx-slot"></span>
+    </span>
+  </header>
+
+  <main class="stage" id="stage">
+    <span class="cross cross-tl" aria-hidden="true"></span>
+    <span class="cross cross-tr" aria-hidden="true"></span>
+    <span class="cross cross-bl" aria-hidden="true"></span>
+    <span class="cross cross-br" aria-hidden="true"></span>
+
+    <!-- ══════════ 01 · KAPAK ══════════ -->
+    <section class="slide active">
+      <div class="two-col cover-col">
+        <div class="orb-col">
+          <canvas id="orb" role="img" aria-label="Cogitave"></canvas>
+        </div>
+        <div>
+          <div class="kicker mono"><b>01</b> / <span class="tr">OTONOM AJAN ÇÖZÜMLERİ · NAMZU</span><span class="en">AUTONOMOUS AGENT SOLUTIONS · NAMZU</span></div>
+          <p class="cover-slogan"><span class="tr">Süreçleriniz kendini yürütsün; kontrol sizde kalsın.</span><span class="en">Let your processes run themselves; keep control in your hands.</span></p>
+          <div class="layers">
+            <div class="layer"><span class="tr">İŞ SÜREÇLERİNİZ</span><span class="en">YOUR PROCESSES</span><small class="tr">OPERASYON · DESTEK · VERİ</small><small class="en">OPS · SUPPORT · DATA</small></div>
+            <div class="layer"><span class="tr">SİZE ÖZEL AJANLAR</span><span class="en">YOUR CUSTOM AGENTS</span><small>COGITAVE</small></div>
+            <div class="layer hot">namzu<small class="tr">İZOLASYON · BÜTÇE · BELLEK · DENETİM</small><small class="en">ISOLATION · BUDGET · MEMORY · AUDIT</small></div>
+            <div class="layer"><span class="tr">DİLEDİĞİNİZ DİL MODELİ</span><span class="en">ANY LANGUAGE MODEL</span><small class="tr">BULUT VEYA TAMAMEN YEREL · OLLAMA · LM STUDIO</small><small class="en">CLOUD OR FULLY LOCAL · OLLAMA · LM STUDIO</small></div>
+          </div>
+          <div class="chips mono" style="margin-top:20px">
+            <span class="chip hot">NAMZU · <span class="tr">AJAN ÇEKİRDEĞİ</span><span class="en">AGENT KERNEL</span></span>
+            <span class="chip"><span class="tr">DANIŞMANLIK + GELİŞTİRME</span><span class="en">CONSULTING + DEVELOPMENT</span></span>
+            <span class="chip"><span class="tr">AÇIK KAYNAK</span><span class="en">OPEN SOURCE</span></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ 02 · FIRSAT ══════════ -->
+    <section class="slide">
+      <div class="kicker mono"><b>02</b> / <span class="tr">FIRSAT</span><span class="en">THE OPPORTUNITY</span></div>
+      <h2>
+        <span class="tr">Yapay zekâ <span class="accent">daha fazlasını</span> yapabilir.</span>
+        <span class="en">AI can do <span class="accent">much more.</span></span>
+      </h2>
+      <p class="lede">
+        <span class="tr">Yapay zekâ artık yalnızca yanıt vermiyor; süreç yürütüyor. McKinsey'e göre kurumların %78'i yapay zekâyı en az bir fonksiyonda kullanıyor; buna karşın Gartner, agentic projelerin %40'ından fazlasının 2027 sonuna kadar iptal edileceğini öngörüyor. Fark, kullananla değer üretenin arasında; ve doğru çekirdek, doğru kurguyla başlıyor.</span>
+        <span class="en">AI no longer just answers; it runs processes. McKinsey finds 78% of organizations already use AI in at least one function; yet Gartner predicts more than 40% of agentic projects will be canceled by the end of 2027. The gap is between using AI and creating value with it; and it starts with the right kernel and the right setup.</span>
+      </p>
+      <div class="grid g3">
+        <div class="cell"><span class="no mono">A</span>
+          <h3><span class="tr">Pilotta kalan projeler</span><span class="en">Pilots that stall</span></h3>
+          <p><span class="tr">MIT araştırmasına göre üretken yapay zekâ pilotlarının %95'i ölçülebilir getiri üretemiyor. Dalga ise büyüyor: Deloitte, 2027'de GenAI kullanan şirketlerin yarısının ajan pilotu çalıştıracağını öngörüyor. Rekabet, pilotu geçebilenlerin olacak.</span><span class="en">MIT research finds 95% of generative AI pilots deliver no measurable return. Yet the wave is building: Deloitte predicts that by 2027, half of GenAI-using companies will run agentic pilots. The edge will belong to those who get past the pilot.</span></p>
+        </div>
+        <div class="cell"><span class="no mono">B</span>
+          <h3><span class="tr">Tekrarlayan manuel iş</span><span class="en">Repetitive manual work</span></h3>
+          <p><span class="tr">Ekiplerin zamanı; veri girişi, belge kontrolü ve sistemler arası kopyala-yapıştır ile tükeniyor. Asana'nın araştırmasına göre çalışma gününün %58'i asıl işe değil, "iş hakkındaki işe" gidiyor.</span><span class="en">Teams burn their time on data entry, document checks, and copy-paste between systems. Asana's research finds 58% of the workday goes to "work about work" instead of the work itself.</span></p>
+        </div>
+        <div class="cell"><span class="no mono">C</span>
+          <h3><span class="tr">Kontrolsüz araç yığını</span><span class="en">Uncontrolled tool sprawl</span></h3>
+          <p><span class="tr">Her ekip ayrı bir yapay zekâ aracı deniyor; tek güvenlik modeli yok. IBM'e göre veri ihlallerinin %20'sinde izinsiz "gölge YZ" var ve ihlal başına ortalama 670 bin dolar ek maliyet yazıyor.</span><span class="en">Every team tries a different AI tool; there's no single security model. Per IBM, 20% of data breaches involve unsanctioned "shadow AI", adding an average $670K to the cost of each breach.</span></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ 03 · EKOSİSTEM ══════════ -->
+    <section class="slide">
+      <div class="kicker mono"><b>03</b> / <span class="tr">ÇÖZÜMLERİMİZ · COGITAVE</span><span class="en">OUR STACK · COGITAVE</span></div>
+      <h2>
+        <span class="tr">Ajan altyapısını <span class="accent">temelinden</span> inşa eden ekip.</span>
+        <span class="en">The team building agent infrastructure <span class="accent">from the ground up.</span></span>
+      </h2>
+      <p class="lede">
+        <span class="tr">Piyasa, hazır modelin üzerine kapak geçirilmiş araçlarla ve özensiz "AI slop" ürünlerle dolu. Biz başka bir noktaya odaklandık: ajanların üzerinde koştuğu altyapının kendisini, mühendislik disipliniyle ve açık standartlarla inşa ediyoruz.</span>
+        <span class="en">The market is full of thin wrappers over off-the-shelf models and careless "AI slop". Our focus is a different point: we engineer the very infrastructure agents run on, with discipline and open standards.</span>
+      </p>
+      <div class="prodgrid">
+        <article class="prod-card">
+          <span class="mono prod-no">01 / <span class="tr">AJAN İŞLETİM SİSTEMİ</span><span class="en">AGENT OPERATING SYSTEM</span></span>
+          <h3 class="prod-name">yuva</h3>
+          <p class="prod-slogan"><span class="tr">"İnsanlar için değil, yalnızca ajanlar için."</span><span class="en">"Not for humans, only for agents."</span></p>
+          <p class="prod-desc">
+            <span class="tr">Ajanların planlandığı, yetkilendirildiği ve gözlemlendiği işletim katmanı. Çıplak donanımda ya da KVM üzerinde konuk olarak çalışır. Kritik çekirdek bileşenleri makine kanıtlı (Kani), bellek kayıtları kurcalamaya karşı imzalı.</span>
+            <span class="en">The operating layer where agents are scheduled, authorized, and observed. Runs on bare metal or as a KVM guest. Critical kernel components are machine-proven (Kani), and memory records are tamper-evident and signed.</span>
+          </p>
+          <div class="prod-stat"><b>34×</b><span class="mono"><span class="tr">FIRECRACKER'A GÖRE DAHA HIZLI BAŞLATMA</span><span class="en">FASTER BOOT VS FIRECRACKER</span></span></div>
+          <span class="prod-tag mono"><span class="tr">AÇIK KAYNAK</span><span class="en">OPEN SOURCE</span></span>
+        </article>
+        <article class="prod-card">
+          <span class="mono prod-no">02 / <span class="tr">AJAN ÇEKİRDEĞİ</span><span class="en">AGENT KERNEL</span></span>
+          <h3 class="prod-name">namzu</h3>
+          <p class="prod-slogan"><span class="tr">"Her ajanın altında aynı çekirdek."</span><span class="en">"The same kernel under every agent."</span></p>
+          <p class="prod-desc">
+            <span class="tr">Açık kaynak agent kernel. Tam kontrol sizde: dış bağımlılık olmadan kurumsala kurulur, uyarlanır, özelleştirilir. Üzerine arayüzünüzü koyun, çalışsın.</span>
+            <span class="en">The open-source agent kernel. Full control: deployed, adapted, and customized in the enterprise with no external dependencies. Put your interface on top and it runs.</span>
+          </p>
+          <div class="prod-stat"><b>0</b><span class="mono"><span class="tr">DIŞ BAĞIMLILIK · ÇEKİRDEK TAMAMEN SİZİN</span><span class="en">EXTERNAL DEPENDENCIES · THE KERNEL IS YOURS</span></span></div>
+          <span class="prod-tag mono hot"><span class="tr">BUGÜN HİZMETTE</span><span class="en">AVAILABLE TODAY</span></span>
+        </article>
+        <article class="prod-card">
+          <span class="mono prod-no">03 / <span class="tr">ORCHESTRATOR AJAN</span><span class="en">ORCHESTRATOR AGENT</span></span>
+          <h3 class="prod-name">cogi</h3>
+          <p class="prod-slogan"><span class="tr">"Şirketinizi tanıyan ajan."</span><span class="en">"The agent that knows your company."</span></p>
+          <p class="prod-desc">
+            <span class="tr">Tam otonom orchestrator ajan: şirketinizi tanır, kullanımınızdan öğrenir, kendi LoRA'sını eğitir ve kendi modelini çıkarır.</span>
+            <span class="en">A fully autonomous orchestrator agent: it knows your company, learns from your usage, trains its own LoRA, and distills its own model.</span>
+          </p>
+          <div class="prod-stat"><b>∞</b><span class="mono"><span class="tr">KULLANDIKÇA KENDİ MODELİNİ EĞİTİR</span><span class="en">TRAINS ITS OWN MODEL AS YOU USE IT</span></span></div>
+          <span class="prod-tag mono"><span class="tr">YAKINDA</span><span class="en">COMING SOON</span></span>
+        </article>
+      </div>
+    </section>
+
+    <!-- ══════════ 04 · NAMZU NEDİR ══════════ -->
+    <section class="slide">
+      <div class="kicker mono"><b>04</b> / <span class="tr">NAMZU NEDİR?</span><span class="en">WHAT IS NAMZU?</span></div>
+      <h2>
+        <span class="tr">Ajanlarınız için güvenli bir <span class="accent">çekirdek.</span></span>
+        <span class="en">A secure <span class="accent">kernel</span> for your agents.</span>
+      </h2>
+      <p class="lede">
+        <span class="tr">Bir işletim sistemi çekirdeği bilgisayarınız için ne ise, namzu da yapay zekâ ajanlarınız için odur: her ajanı izole eder, harcamasını sınırlar, hafızasını yönetir ve yaptığı her işi kayıt altına alır. Büyük işleri alt-ajanlara bölmek de çekirdeğin işidir: delegasyon; izolasyon ve bütçeyle birlikte gelir.</span>
+        <span class="en">What an operating system kernel is to your computer, namzu is to your AI agents: it isolates every agent, caps its spending, manages its memory, and records everything it does. Splitting big jobs across sub-agents is the kernel's job too: delegation ships with isolation and budgets built in.</span>
+      </p>
+      <div class="grid g4">
+        <div class="cell"><span class="no mono">01</span>
+          <h3><span class="tr">İzolasyon</span><span class="en">Isolation</span></h3>
+          <p><span class="tr">Her ajan izole bir sandbox içinde çalışır; dosya ve ağ erişimi varsayılan olarak kapalıdır. İzolasyon 2026 endüstri standardıyla hizalı kademeli bir mimaridir: süreç, konteyner (Docker) ve mikro-VM. Mikro-VM katmanında tercih sizin: Firecracker ya da yuva. Kademe değişir, ajan kodu değişmez.</span><span class="en">Every agent runs in an isolated sandbox; file and network access is denied by default. Isolation is a tiered architecture aligned with the 2026 industry standard: process, container (Docker), and micro-VM. At the micro-VM tier the choice is yours: Firecracker or yuva. The tier changes; the agent code never does.</span></p>
+        </div>
+        <div class="cell"><span class="no mono">02</span>
+          <h3><span class="tr">Bütçe kontrolü</span><span class="en">Budget control</span></h3>
+          <p><span class="tr">Token, maliyet, süre ve yineleme limitleri her çalıştırma için tanımlanır; sürpriz fatura yok.</span><span class="en">Token, cost, time, and iteration limits are set per run; no surprise bills.</span></p>
+        </div>
+        <div class="cell"><span class="no mono">03</span>
+          <h3><span class="tr">Kalıcı bellek</span><span class="en">Durable memory</span></h3>
+          <p><span class="tr">Ajanlar öğrendiklerini saklar, kesintide kaldığı yerden devam eder; her adımda otomatik yedek noktası alınır. Kontrol noktası deposu takılabilirdir: dosyada ya da kendi veritabanınızda tutarsınız.</span><span class="en">Agents retain what they learn and resume after interruptions; checkpoints are taken at every step. The checkpoint store is pluggable: keep it on disk or in your own database.</span></p>
+        </div>
+        <div class="cell"><span class="no mono">04</span>
+          <h3><span class="tr">Denetim izi</span><span class="en">Audit trail</span></h3>
+          <p><span class="tr">Her eylem, izlenebilir bir olay akışına yazılır; kim, ne zaman, neyi, ne kadara yaptı, hepsi görünür. Araç çağrılarının tüm yaşam döngüsü de bu akışa dahildir.</span><span class="en">Every action is written to a traceable event stream; who did what, when, at what cost, all visible. The full lifecycle of every tool call is part of that stream.</span></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ 05 · NASIL ÇALIŞIR ══════════ -->
+    <section class="slide">
+      <div class="kicker mono"><b>05</b> / <span class="tr">NASIL ÇALIŞIR?</span><span class="en">HOW IT WORKS</span></div>
+      <h2>
+        <span class="tr">Tek çekirdek, <span class="accent">uçtan uca</span> akış.</span>
+        <span class="en">One kernel, an <span class="accent">end-to-end</span> flow.</span>
+      </h2>
+      <div class="two-col" style="align-items:center; margin-top:10px">
+        <div class="arch">
+          <div class="layer"><span class="tr">SİZİN ARAYÜZÜNÜZ</span><span class="en">YOUR INTERFACE</span><small>CLI · API · WEB · ERP</small></div>
+          <div class="arch-sep mono" aria-hidden="true">↓</div>
+          <div class="layer hot">namzu<small class="tr">PLANLAMA · BELLEK · BÜTÇE</small><small class="en">PLANNING · MEMORY · BUDGETS</small></div>
+          <div class="arch-sep mono" aria-hidden="true">↓</div>
+          <div class="layer"><span class="tr">HARNESS</span><span class="en">HARNESS</span><small class="tr">İZİN LİSTELİ ARAÇLAR · DOĞRULAMA KAPILARI</small><small class="en">ALLOWLISTED TOOLS · VERIFICATION GATES</small></div>
+          <div class="arch-sep mono" aria-hidden="true">↓</div>
+          <div class="layer"><span class="tr">SANDBOX</span><span class="en">SANDBOX</span><small>SÜREÇ → DOCKER → FIRECRACKER / YUVA</small></div>
+          <div class="arch-sep mono" aria-hidden="true">↓</div>
+          <div class="layer"><span class="tr">MODEL</span><span class="en">MODEL</span><small class="tr">BULUT VEYA TAMAMEN YEREL</small><small class="en">CLOUD OR FULLY LOCAL</small></div>
+          <p class="fine" style="margin-top:10px"><span class="tr">Olay akışı her katmandan beslenir; kayıt denetime hazırdır.</span><span class="en">The event stream taps every layer; records stay audit-ready.</span></p>
+        </div>
+        <div>
+          <div class="term mono" aria-hidden="true">
+            <div class="term-bar"><i></i><i></i><i></i><span>namzu</span></div>
+            <div class="term-body" id="termBody"></div>
+          </div>
+          <p class="fine" style="margin-top:10px"><span class="tr">Temsilî akış: gerçek bir namzu çalıştırmasının olay düzeni.</span><span class="en">Representative flow: the event pattern of a real namzu run.</span></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ 06 · KULLANIM ALANLARI ══════════ -->
+    <section class="slide dense">
+      <div class="kicker mono"><b>06</b> / <span class="tr">KULLANIM ALANLARI</span><span class="en">USE CASES</span></div>
+      <h2>
+        <span class="tr">namzu ile <span class="accent">neler</span> yapılabilir?</span>
+        <span class="en">What can you <span class="accent">build</span> with namzu?</span>
+      </h2>
+      <p class="lede lede-optional" style="margin-top:6px">
+        <span class="tr">Aynı çekirdek, farklı işler: aşağıdaki her senaryo bugün kurulabilir ve hepsi izolasyon, bütçe ve denetim iziyle birlikte gelir.</span>
+        <span class="en">Same kernel, different jobs: every scenario below can be built today, and each ships with isolation, budgets, and an audit trail.</span>
+      </p>
+      <div class="rows rows-2">
+        <div class="row"><span class="row-no mono">01</span>
+          <span class="row-main"><b><span class="tr">Belge ve arka ofis</span><span class="en">Documents &amp; back office</span></b>
+          <small><span class="tr">Fatura, sözleşme ve formlardan veri çıkarılır, doğrulanır, sistemlere işlenir; evrak yığını kuyruğa değil kayda dönüşür.</span><span class="en">Data is extracted from invoices, contracts, and forms, validated, and posted; paperwork becomes records, not backlog.</span></small></span>
+          <span class="row-side mono"><span class="tr">OPERASYON</span><span class="en">OPERATIONS</span></span>
+        </div>
+        <div class="row"><span class="row-no mono">02</span>
+          <span class="row-main"><b><span class="tr">Masraf ve satın alma</span><span class="en">Expenses &amp; procurement</span></b>
+          <small><span class="tr">Masraf fişleri okunur, politikayla karşılaştırılır, istisnalar onaya düşer; satın alma talepleri bütçe kontrolüyle ilerler.</span><span class="en">Receipts are read and checked against policy, exceptions go to approval; purchase requests move with budget control.</span></small></span>
+          <span class="row-side mono"><span class="tr">FİNANS</span><span class="en">FINANCE</span></span>
+        </div>
+        <div class="row"><span class="row-no mono">03</span>
+          <span class="row-main"><b><span class="tr">Finans ve mutabakat</span><span class="en">Finance &amp; reconciliation</span></b>
+          <small><span class="tr">Banka hareketleri faturalarla eşleştirilir, cari mutabakat yazışmaları hazırlanır; ay sonu kapanışının ön işi bitmiş olur.</span><span class="en">Bank lines are matched to invoices, reconciliation letters drafted; month-end prep is done before you start.</span></small></span>
+          <span class="row-side mono"><span class="tr">MUHASEBE</span><span class="en">ACCOUNTING</span></span>
+        </div>
+        <div class="row"><span class="row-no mono">04</span>
+          <span class="row-main"><b><span class="tr">Müşteri operasyonları</span><span class="en">Customer operations</span></b>
+          <small><span class="tr">Talepler sınıflandırılır, yanıt taslakları hazırlanır, rutin işlemler onay akışıyla tamamlanır; bekleyen kuyruk erir.</span><span class="en">Requests are triaged, replies drafted, routine transactions completed with approval flows; the queue melts.</span></small></span>
+          <span class="row-side mono"><span class="tr">DESTEK</span><span class="en">SUPPORT</span></span>
+        </div>
+        <div class="row"><span class="row-no mono">05</span>
+          <span class="row-main"><b><span class="tr">Satış ve CRM düzeni</span><span class="en">Sales &amp; CRM hygiene</span></b>
+          <small><span class="tr">CRM kayıtları güncel tutulur, toplantı özetleri ve takip e-postaları hazırlanır; teklif dokümanı dakikalar içinde çıkar.</span><span class="en">CRM stays current, meeting summaries and follow-ups are drafted; proposals come together in minutes.</span></small></span>
+          <span class="row-side mono"><span class="tr">SATIŞ</span><span class="en">SALES</span></span>
+        </div>
+        <div class="row"><span class="row-no mono">06</span>
+          <span class="row-main"><b><span class="tr">İK ve mesai süreçleri</span><span class="en">HR &amp; workforce processes</span></b>
+          <small><span class="tr">İzin ve süre girişleri toplanır, eksik çizelgeler tamamlatılır, aday özgeçmişleri ön elemeden geçirilir, oryantasyon adım adım yürütülür.</span><span class="en">Leave and time entries are collected, missing timesheets chased, CVs pre-screened, onboarding run step by step.</span></small></span>
+          <span class="row-side mono"><span class="tr">İK</span><span class="en">HR</span></span>
+        </div>
+        <div class="row"><span class="row-no mono">07</span>
+          <span class="row-main"><b><span class="tr">Veri işleme ve raporlama</span><span class="en">Data &amp; reporting</span></b>
+          <small><span class="tr">Dağınık kaynaklardan veri toplanır ve temizlenir; yönetim raporları her sabah hazır bekler.</span><span class="en">Data is gathered from scattered sources and cleaned; management reports are ready every morning.</span></small></span>
+          <span class="row-side mono"><span class="tr">VERİ</span><span class="en">DATA</span></span>
+        </div>
+        <div class="row"><span class="row-no mono">08</span>
+          <span class="row-main"><b><span class="tr">Sistem entegrasyonu</span><span class="en">System integration</span></b>
+          <small><span class="tr">MCP standardı ile ERP, CRM ve iç araçlara bağlanılır; sistemler arası köprüler haftalar değil günler içinde kurulur.</span><span class="en">Agents connect to ERP, CRM, and internal tools via MCP; cross-system bridges take days, not weeks.</span></small></span>
+          <span class="row-side mono"><span class="tr">ENTEGRASYON</span><span class="en">INTEGRATION</span></span>
+        </div>
+        <div class="row"><span class="row-no mono">09</span>
+          <span class="row-main"><b><span class="tr">Kurum içi asistan</span><span class="en">In-house assistant</span></b>
+          <small><span class="tr">OpenClaw tarzı asistanların kurumsal sürümü mümkün: şirket bilgisiyle çalışır, iş akışı başlatır, verisi içeride kalır.</span><span class="en">The enterprise take on assistants like OpenClaw: works with company knowledge, starts workflows, data stays inside.</span></small></span>
+          <span class="row-side mono"><span class="tr">BİLGİ</span><span class="en">KNOWLEDGE</span></span>
+        </div>
+        <div class="row"><span class="row-no mono">10</span>
+          <span class="row-main"><b><span class="tr">Kurum içi kodlama ajanı</span><span class="en">In-house coding agent</span></b>
+          <small><span class="tr">OpenCode benzeri bir kodlama ajanının kurum içi sürümü kurulabilir: kod dışarı çıkmaz, commit ve bug analizi içeride, güvenlik cogi ile desteklenir.</span><span class="en">An in-house take on coding agents like OpenCode: code never leaves, commit and bug analysis stay internal, security backed by cogi.</span></small></span>
+          <span class="row-side mono"><span class="tr">GELİŞTİRME</span><span class="en">ENGINEERING</span></span>
+        </div>
+        <div class="row"><span class="row-no mono">11</span>
+          <span class="row-main"><b><span class="tr">Uyum ve denetim</span><span class="en">Compliance &amp; audit</span></b>
+          <small><span class="tr">Sözleşme yükümlülükleri izlenir, kişisel veriler KVKK kapsamında taranır; denetim kanıtları olay akışından kendiliğinden derlenir.</span><span class="en">Contract obligations are tracked, personal data scanned for compliance; audit evidence compiles itself from the event stream.</span></small></span>
+          <span class="row-side mono"><span class="tr">UYUM</span><span class="en">COMPLIANCE</span></span>
+        </div>
+        <div class="row"><span class="row-no mono">12</span>
+          <span class="row-main"><b><span class="tr">7/24 izleme ve operasyon</span><span class="en">24/7 monitoring &amp; operations</span></b>
+          <small><span class="tr">Sistemler sürekli izlenir, anormallikler raporlanır, tanımlı sınırlar içinde müdahale edilir; gece vardiyası hiç uyumaz.</span><span class="en">Systems are watched around the clock, anomalies reported, action taken within defined limits; the night shift never sleeps.</span></small></span>
+          <span class="row-side mono"><span class="tr">İZLEME</span><span class="en">MONITORING</span></span>
+        </div>
+        <div class="row"><span class="row-no mono">13</span>
+          <span class="row-main"><b><span class="tr">Depo ve WMS süreçleri</span><span class="en">Warehouse &amp; WMS processes</span></b>
+          <small><span class="tr">Mal kabulden sevkiyata sipariş akışı uçtan uca yürütülür; stok mutabakatı ve WMS-ERP köprüsü ajanlardadır.</span><span class="en">Order flow runs end to end, inbound to dispatch; stock reconciliation and the WMS-ERP bridge live with the agents.</span></small></span>
+          <span class="row-side mono"><span class="tr">LOJİSTİK</span><span class="en">LOGISTICS</span></span>
+        </div>
+        <div class="row"><span class="row-no mono">14</span>
+          <span class="row-main"><b><span class="tr">Fabrika ve saha operasyonu</span><span class="en">Factory &amp; field operations</span></b>
+          <small><span class="tr">Operatörün makineleri tek zemine bağlanır; üretim süreci ve anomaliler uçtan uca izlenir.</span><span class="en">The operator's machines connect to one foundation; the process and anomalies are tracked end to end.</span></small></span>
+          <span class="row-side mono"><span class="tr">ÜRETİM</span><span class="en">PRODUCTION</span></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ 07 · BİR ÖRNEK: MASRAF GİRİŞİ ══════════ -->
+    <section class="slide dense">
+      <div class="kicker mono"><b>07</b> / <span class="tr">BİR ÖRNEK, UÇTAN UCA</span><span class="en">ONE EXAMPLE, END TO END</span></div>
+      <h2>
+        <span class="tr">Tanıdık bir dert: <span class="accent">masraf girişi.</span></span>
+        <span class="en">A familiar pain: <span class="accent">expense entry.</span></span>
+      </h2>
+      <p class="lede">
+        <span class="tr">GBTA araştırmasına göre tek bir masraf raporunu işlemek ortalama 20 dakika ve 58 dolar; raporların %19'u hatalı çıkıyor ve her düzeltme 18 dakika daha alıyor. Muhasebenin ay sonu koşturması, bu küçük maliyetlerin toplamıdır.</span>
+        <span class="en">GBTA research puts processing a single expense report at 20 minutes and 58 dollars on average; 19% of reports contain errors, and each correction takes another 18 minutes. Accounting's end-of-month rush is the sum of these small costs.</span>
+      </p>
+      <div class="two-col" style="align-items:start; margin-top:8px">
+        <div>
+          <div class="kicker mono" style="margin-bottom:12px"><span class="tr">AJANIN AKIŞI</span><span class="en">THE AGENT'S FLOW</span></div>
+          <div class="layers">
+            <div class="layer"><span class="lbl"><span class="tr">FİŞ GELİR</span><span class="en">RECEIPT ARRIVES</span></span><small class="tr">ÇALIŞAN FOTOĞRAFI İLETİR</small><small class="en">EMPLOYEE SENDS A PHOTO</small></div>
+            <div class="layer"><span class="lbl"><span class="tr">AJAN OKUR, SINIFLANDIRIR</span><span class="en">AGENT READS &amp; CLASSIFIES</span></span><small class="tr">TUTAR · KATEGORİ · POLİTİKA</small><small class="en">AMOUNT · CATEGORY · POLICY</small></div>
+            <div class="layer hot"><span class="lbl"><span class="tr">İSTİSNADA İNSAN ONAYI</span><span class="en">HUMAN APPROVAL ON EXCEPTIONS</span></span><small class="tr">YALNIZCA AYKIRI KALEMLER SORULUR</small><small class="en">ONLY OUTLIERS ARE ESCALATED</small></div>
+            <div class="layer"><span class="lbl"><span class="tr">KAYIT VE RAPOR</span><span class="en">POSTING &amp; REPORT</span></span><small class="tr">MUHASEBEYE İŞLENİR, İZİ KALIR</small><small class="en">POSTED TO ACCOUNTING, FULLY TRACED</small></div>
+          </div>
+        </div>
+        <div>
+          <div class="kicker mono" style="margin-bottom:12px"><span class="tr">FİŞ BAŞINA MALİYET</span><span class="en">COST PER RECEIPT</span></div>
+          <div class="bar-row">
+            <span class="bar-lab mono"><span class="tr">MANUEL İŞLEM (GBTA)</span><span class="en">MANUAL PROCESSING (GBTA)</span></span>
+            <div class="bar-track"><i class="bar-fill bar-dim" style="width:100%"></i><span class="bar-val mono">$58</span></div>
+          </div>
+          <div class="bar-row">
+            <span class="bar-lab mono"><span class="tr">AJANLA · YALNIZCA MODEL MALİYETİ</span><span class="en">WITH THE AGENT · MODEL COST ONLY</span></span>
+            <div class="bar-track"><i class="bar-fill bar-hot" style="width:2.2%"></i><span class="bar-val mono">&lt;$1</span></div>
+          </div>
+          <div class="statband" style="grid-template-columns:1fr 1fr; margin-top:14px">
+            <div class="stat" style="padding:16px 18px"><b>≈50×</b>
+              <div class="lab"><span class="tr">Fiş başına maliyet farkı</span><span class="en">Cost gap per receipt</span></div>
+            </div>
+            <div class="stat" style="padding:16px 18px"><b>%19</b>
+              <div class="lab"><span class="tr">Manuel hata oranı</span><span class="en">Manual error rate</span></div>
+            </div>
+          </div>
+          <div class="callout" style="margin-top:12px">
+            <span class="tr">Ay sonunda muhasebe yüzlerce fişi değil, yalnızca istisnaları görür. Kalan her şey: kayıtlı, izlenebilir, raporu hazır.</span>
+            <span class="en">At month's end, accounting sees only the exceptions, not hundreds of receipts. Everything else: recorded, traceable, report ready.</span>
+          </div>
+          <p class="fine">
+            <span class="tr">Okuma doğruluğu, tercih edilen OCR modelinin performansına doğrudan bağlıdır; akıl yürütme tarafındaki maliyet de seçilen modele göre değişir. Bütçe tavanını her durumda siz belirlersiniz.</span>
+            <span class="en">Reading accuracy depends directly on the chosen OCR model; reasoning-side cost varies with the model you select. In every case, you set the budget ceiling.</span>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ 08 · VERİMLİLİK ══════════ -->
+    <section class="slide">
+      <div class="kicker mono"><b>08</b> / <span class="tr">VERİMLİLİK</span><span class="en">EFFICIENCY</span></div>
+      <h2>
+        <span class="tr">Verimlilik artışı <span class="accent">nereden</span> gelir?</span>
+        <span class="en">Where does the <span class="accent">efficiency</span> come from?</span>
+      </h2>
+      <p class="lede">
+        <span class="tr">Kazanç yalnızca hızdan değil; işin kesintisiz, öngörülebilir maliyetle ve insan onayına bağlı kritik noktalarla sürmesinden gelir. Ekipleriniz rutini ajanlara bırakır, katma değerli işe odaklanır.</span>
+        <span class="en">The gains come not just from speed, but from work that runs continuously, at predictable cost, with human approval at the critical points. Your teams hand routine work to agents and focus on what adds value.</span>
+      </p>
+      <div class="statband">
+        <div class="stat"><b>7/24</b>
+          <div class="lab"><span class="tr">Kesintisiz operasyon</span><span class="en">Continuous operation</span></div>
+          <div class="sub"><span class="tr">Ajanlar mesai bilmez; işler gece de tatilde de ilerler.</span><span class="en">Agents keep no office hours; work moves at night and on holidays.</span></div>
+        </div>
+        <div class="stat"><b>%100</b>
+          <div class="lab"><span class="tr">İzlenebilir eylem</span><span class="en">Traceable actions</span></div>
+          <div class="sub"><span class="tr">Her adım olay akışına yazılır; denetim ve raporlama hazır gelir.</span><span class="en">Every step lands in the event stream; audit and reporting come built in.</span></div>
+        </div>
+        <div class="stat"><b>0</b>
+          <div class="lab"><span class="tr">Varsayılan erişim</span><span class="en">Default access</span></div>
+          <div class="sub"><span class="tr">Dosya ve ağ erişimi kapalı başlar; yalnızca izin verdiğiniz açılır.</span><span class="en">File and network access starts closed; only what you allow opens.</span></div>
+        </div>
+        <div class="stat"><b>1<span style="font-size:.5em"> </span></b>
+          <div class="lab"><span class="tr">Satırda sağlayıcı değişimi</span><span class="en">Line to switch providers</span></div>
+          <div class="sub"><span class="tr">Sağlayıcılar çekirdeğe tak-çıkar bağlanır: Anthropic, OpenAI ya da tamamen yerel Ollama / LM Studio; tek satırla geçin, bağımlı kalmayın.</span><span class="en">Providers plug into the kernel: Anthropic, OpenAI, or fully local Ollama / LM Studio; switch with one line, never get locked in.</span></div>
+        </div>
+      </div>
+      <div class="callout">
+        <span class="tag-mono"><span class="tr">SIRADA</span><span class="en">NEXT</span></span>
+        <span class="tr"><b>Maliyet eğrisi sizin lehinize çalışır:</b> sınır model fiyatı GPT-4'ten bugünün GPT-5.6'sına 60 dolardan 15 dolara indi; aynı zekâ seviyesinin çıkarım maliyeti her yıl ~10 kat düşüyor. namzu, kendisine eğitilmiş modellerle bu eğriyi daha da aşağı çeker; cogi'nin otonom LoRA döngüsü tam bu gelecek için kuruldu.</span>
+        <span class="en"><b>The cost curve works in your favor:</b> frontier pricing fell from $60 per million tokens at GPT-4 to $15 at today's GPT-5.6, and the cost of a given level of intelligence drops ~10× every year. namzu pushes that curve further down with models trained for the kernel; cogi's autonomous LoRA loop was built exactly for that future.</span>
+      </div>
+    </section>
+
+    <!-- ══════════ 09 · KANITLANMIŞ VERİMLİLİK ══════════ -->
+    <section class="slide dense">
+      <div class="kicker mono"><b>09</b> / <span class="tr">KANITLANMIŞ VERİMLİLİK</span><span class="en">PROVEN EFFICIENCY</span></div>
+      <h2>
+        <span class="tr">Rakamlar bizden değil; <span class="accent">araştırmalardan.</span></span>
+        <span class="en">The numbers aren't ours; <span class="accent">they're from research.</span></span>
+      </h2>
+      <p class="lede">
+        <span class="tr">Yapay zekânın verimlilik etkisi artık anekdot değil; hakemli çalışmalar ve büyük ölçekli saha deneyleriyle ölçüldü. Aşağıdaki her rakam, yayımlanmış gerçek bir araştırmaya dayanır.</span>
+        <span class="en">AI's productivity impact is no longer anecdotal; it has been measured in peer-reviewed studies and large-scale field experiments. Every figure below comes from a published study.</span>
+      </p>
+      <div class="statband">
+        <div class="stat"><b>+%15</b>
+          <div class="lab"><span class="tr">Çağrı merkezi üretkenliği</span><span class="en">Call-center productivity</span></div>
+          <div class="sub"><span class="tr">Saatte çözülen görüşme; yeni personelde +%34. 5.172 temsilciyle saha deneyi — Stanford &amp; MIT, hakemli (QJE, 2025).</span><span class="en">Issues resolved per hour; +34% for newer staff. Field study of 5,172 agents — Stanford &amp; MIT, peer-reviewed (QJE, 2025).</span></div>
+        </div>
+        <div class="stat"><b>+%26</b>
+          <div class="lab"><span class="tr">Geliştirici çıktısında artış</span><span class="en">More developer output</span></div>
+          <div class="sub"><span class="tr">Microsoft ve Accenture'da ~5.000 geliştiriciyle randomize saha deneyleri: tamamlanan görev sayısı +%26 — Cui ve ark. (2024).</span><span class="en">Randomized field experiments with ~5,000 developers at Microsoft and Accenture: completed tasks up 26% — Cui et al. (2024).</span></div>
+        </div>
+        <div class="stat"><b>1≈2</b>
+          <div class="lab"><span class="tr">Bir kişi + YZ, iki kişilik takıma denk</span><span class="en">One person + AI matches a team of two</span></div>
+          <div class="sub"><span class="tr">776 P&amp;G profesyoneliyle saha deneyi: YZ'li bireyler, YZ'siz takımların performansına ulaştı — Harvard &amp; Wharton (NBER, 2025).</span><span class="en">Field experiment with 776 P&amp;G professionals: individuals with AI matched the performance of teams without it — Harvard &amp; Wharton (NBER, 2025).</span></div>
+        </div>
+        <div class="stat"><b>3×</b>
+          <div class="lab"><span class="tr">Çalışan başına gelir artışı</span><span class="en">Revenue growth per employee</span></div>
+          <div class="sub"><span class="tr">YZ'ye en açık sektörlerde %27, en az açık olanlarda %9; bir milyara yakın iş ilanı analizi — PwC Global AI Jobs Barometer (2025).</span><span class="en">27% in the most AI-exposed industries vs 9% in the least; analysis of nearly a billion job ads — PwC Global AI Jobs Barometer (2025).</span></div>
+        </div>
+      </div>
+      <div class="callout">
+        <span class="tag-mono"><span class="tr">NOT</span><span class="en">NOTE</span></span>
+        <span class="tr"><b>Kazanç, kurguya bağlıdır:</b> aynı araştırmalar, getirinin doğru süreç seçimi ve insan onaylı akışlarla geldiğini gösteriyor. namzu'daki bütçe ve doğrulama kapıları tam bu köprüyü kurar.</span>
+        <span class="en"><b>The gains depend on the setup:</b> the same studies show returns come from picking the right processes and keeping humans in the loop. namzu's budget and verification gates are exactly that bridge.</span>
+      </div>
+    </section>
+
+    <!-- ══════════ 10 · GÜVENLİK ══════════ -->
+    <section class="slide dense">
+      <div class="kicker mono"><b>10</b> / <span class="tr">GÜVENLİK VE UYUM</span><span class="en">SECURITY &amp; COMPLIANCE</span></div>
+      <h2>
+        <span class="tr">Kurumsal güven, <span class="accent">tasarımdan</span> gelir.</span>
+        <span class="en">Enterprise trust, <span class="accent">by design.</span></span>
+      </h2>
+      <p class="lede lede-optional" style="margin-top:4px">
+        <span class="tr">IBM'in 2025 ihlal raporuna göre, yapay zekâ kaynaklı ihlal yaşayan kurumların %97'sinde YZ erişim kontrolleri eksikti. namzu'da kontrol sonradan eklenmez; varsayılandır.</span>
+        <span class="en">Per IBM's 2025 breach report, 97% of organizations hit by AI-related breaches lacked AI access controls. In namzu, control isn't bolted on later; it's the default.</span>
+      </p>
+      <div class="two-col" style="align-items:start; margin-top:6px">
+        <div class="rows" style="margin-top:16px">
+          <div class="row"><span class="row-no mono">A</span>
+            <span class="row-main"><b><span class="tr">Ajan kandırılırsa?</span><span class="en">What if the agent gets tricked?</span></b>
+            <small><span class="tr">OWASP'ın 1 numaralı LLM riski prompt injection'dır: ajanı kandırıp yetkisini kötüye kullandırmak. namzu'da araçlar izin listelidir, her sınırda girdi doğrulanır, kritik çıktı doğrulama kapısından geçer.</span><span class="en">OWASP's #1 LLM risk is prompt injection: tricking an agent into abusing its authority. In namzu, tools are allowlisted, every boundary validates input, and critical output passes a verification gate.</span></small></span>
+          </div>
+          <div class="row"><span class="row-no mono">B</span>
+            <span class="row-main"><b><span class="tr">Ajan sapıtırsa?</span><span class="en">What if the agent goes rogue?</span></b>
+            <small><span class="tr">Sandbox varsayılan kapalıdır: dosya ve ağ erişimi tek tek, bilinçli açılır. İzolasyon arka ucunu siz seçersiniz: ister yuva, ister Firecracker.</span><span class="en">The sandbox is closed by default: file and network access opens deliberately, one permission at a time. You choose the isolation backend: yuva or Firecracker.</span></small></span>
+          </div>
+          <div class="row"><span class="row-no mono">C</span>
+            <span class="row-main"><b><span class="tr">Yetkisi taşarsa?</span><span class="en">What if it oversteps?</span></b>
+            <small><span class="tr">En az yetki ilkesi: ajan yalnızca görev kapsamındaki araçları görür; silme ve imha gibi yıkıcı komutlar harness'ta tam engellidir; yüksek etkili adımlar insan onayına düşer.</span><span class="en">Least privilege: an agent sees only the tools in its task scope; destructive commands like delete and wipe are fully blocked in the harness; high-impact steps escalate to a human.</span></small></span>
+          </div>
+          <div class="row"><span class="row-no mono">D</span>
+            <span class="row-main"><b><span class="tr">Fazla harcarsa, durdurmak gerekirse?</span><span class="en">What if it overspends, or must stop?</span></b>
+            <small><span class="tr">Her çalıştırmanın token, para, süre ve yineleme bütçesi vardır; aşımda ajan güvenle durur. Tek komutla tüm ajan ağacı duraklatılır, sürdürülür veya iptal edilir.</span><span class="en">Every run carries token, money, time, and iteration budgets; on breach the agent stops safely. One command pauses, resumes, or aborts the entire agent tree.</span></small></span>
+          </div>
+          <div class="row"><span class="row-no mono">E</span>
+            <span class="row-main"><b><span class="tr">Kim, neyi, ne zaman yaptı?</span><span class="en">Who did what, and when?</span></b>
+            <small><span class="tr">Her eylem, araç çağrılarının tüm yaşam döngüsü dahil, izlenebilir olay akışına yazılır; denetime hazır kayıt hazır bekler.</span><span class="en">Every action, including the full lifecycle of each tool call, lands in a traceable event stream; audit-ready records are always on hand.</span></small></span>
+          </div>
+          <div class="row"><span class="row-no mono">F</span>
+            <span class="row-main"><b><span class="tr">Mevzuata uyum?</span><span class="en">And compliance?</span></b>
+            <small><span class="tr">Yerel model ve kurum içi kurulumla veri sizde kalır: KVKK/GDPR için güçlü zemin. Denetlenebilirlik AB YZ Yasası'na hazır; süreçler ISO/IEC 42001 yaklaşımıyla hizalı.</span><span class="en">Local models and on-premise deployment keep data with you: solid KVKK/GDPR footing. Auditability is EU AI Act-ready; processes align with the ISO/IEC 42001 approach.</span></small></span>
+          </div>
+        </div>
+        <div>
+          <div class="layers" style="margin-top:20px">
+            <div class="layer hot"><span class="tr">SANDBOX</span><span class="en">SANDBOX</span><small class="tr">4 KADEME · SÜREÇ → DOCKER → FIRECRACKER / YUVA</small><small class="en">4 TIERS · PROCESS → DOCKER → FIRECRACKER / YUVA</small></div>
+            <div class="layer"><span class="tr">BÜTÇE KAPILARI</span><span class="en">BUDGET GATES</span><small>TOKEN · <span class="tr">MALİYET · SÜRE</span><span class="en">COST · TIME</span></small></div>
+            <div class="layer"><span class="tr">İNSAN ONAYI</span><span class="en">HUMAN APPROVAL</span><small class="tr">KRİTİK ADIMLARDA</small><small class="en">AT CRITICAL STEPS</small></div>
+            <div class="layer"><span class="tr">OLAY AKIŞI</span><span class="en">EVENT STREAM</span><small class="tr">DENETLENEBİLİR KAYIT</small><small class="en">AUDITABLE RECORD</small></div>
+          </div>
+          <div class="callout" style="margin-top:14px">
+            <span class="tag-mono"><span class="tr">KANIT</span><span class="en">PROOF</span></span>
+            <span class="tr"><b>İddia değil, kanıt:</b> yayınlar npm provenance imzası ve SLSA derleme kanıtıyla çıkar; kod açıktır, olay akışı her eylemi kayıt altında tutar. Ne çalıştırdığınızı bize sormazsınız; kendiniz doğrularsınız.</span>
+            <span class="en"><b>Not claims, proof:</b> releases ship with npm provenance attestation and SLSA build provenance; the code is open, and the event stream records every action. You don't ask us what you're running; you verify it yourself.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ 11 · ŞEFFAFLIK VE GÜVEN ══════════ -->
+    <section class="slide">
+      <div class="kicker mono"><b>11</b> / <span class="tr">ŞEFFAFLIK VE GÜVEN</span><span class="en">TRANSPARENCY &amp; TRUST</span></div>
+      <h2>
+        <span class="tr">Kara kutu değil; <span class="accent">uçtan uca açık.</span></span>
+        <span class="en">Not a black box; <span class="accent">open end to end.</span></span>
+      </h2>
+      <p class="lede">
+        <span class="tr">Vercel AI SDK ve OpenAI Agents SDK gibi araçlar sizi kendi platformlarına bağlar; izleme ve trafik onların bulutundan geçer. Kapalı kurumsal ürünlerde ise derlenmiş, şifrelenmiş kutunun içini denetleyemezsiniz bile. namzu tam tersidir: her satır gözünüzün önünde, verileriniz ve kontrol tamamen sizde. Şeffaflık artık tercih de değil: AB Yapay Zekâ Yasası kademeli olarak yürürlükte, denetlenebilirlik yükümlülük hâline geliyor.</span>
+        <span class="en">Tools like the Vercel AI SDK and the OpenAI Agents SDK tie you to their platforms; tracing and traffic run through their cloud. With closed enterprise products, you can't even inspect the compiled, encrypted box. namzu is the exact opposite: every line is in plain sight, and your data and control stay entirely with you. Transparency is no longer optional either: the EU AI Act is phasing in, turning auditability into an obligation.</span>
+      </p>
+      <div class="grid g4">
+        <div class="cell"><span class="no mono"><span class="tr">KOD</span><span class="en">CODE</span></span>
+          <h3><span class="tr">Uçtan uca açık kaynak</span><span class="en">Open source, end to end</span></h3>
+          <p><span class="tr">Kurumunuzun çekirdeğinde ne çalıştığını bilmek hakkınızdır. namzu'nun kaynak kodunun tamamı açıktır; ne çalıştırdığınızı istediğiniz an, satır satır denetlersiniz.</span><span class="en">You have the right to know what runs at your core. All of namzu's source code is open; you can audit exactly what you run, line by line, any time.</span></p>
+        </div>
+        <div class="cell"><span class="no mono"><span class="tr">VERİ</span><span class="en">DATA</span></span>
+          <h3><span class="tr">Mesajlarınız toplanmaz</span><span class="en">Your messages stay yours</span></h3>
+          <p><span class="tr">SDK, kullanıcı mesajlarını ve logları bize göndermez; gizli telemetri yoktur. Verileriniz kurumunuzun dışına çıkmaz.</span><span class="en">The SDK sends no user messages or logs to us; there is no hidden telemetry. Your data never leaves your organization.</span></p>
+        </div>
+        <div class="cell"><span class="no mono"><span class="tr">SEKTÖRLER</span><span class="en">SECTORS</span></span>
+          <h3><span class="tr">Bankadan sahaya, her yerde</span><span class="en">From banking to the field</span></h3>
+          <p><span class="tr">Veri hassasiyeti en yüksek kurumlarda bile gönül rahatlığıyla kullanılır: bankacılık, sağlık, kamu ve daha fazlası.</span><span class="en">Fit for even the most data-sensitive institutions: banking, healthcare, the public sector, and more.</span></p>
+        </div>
+        <div class="cell"><span class="no mono">FORK</span>
+          <h3><span class="tr">Forklayın, devam edin</span><span class="en">Fork it, carry on</span></h3>
+          <p><span class="tr">Ekipleriniz namzu'yu kendi iç süreçlerini geliştirmek için temel alabilir; dilerse projeyi çatallayıp kendi yönünde sürdürür. Kimseye bağımlı kalmazsınız.</span><span class="en">Your teams can build internal work on namzu, and fork the project to take it in their own direction. You depend on no one.</span></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ 12 · HİZMET YELPAZESİ ══════════ -->
+    <section class="slide dense">
+      <div class="kicker mono"><b>12</b> / <span class="tr">HİZMET YELPAZESİ</span><span class="en">WHAT WE OFFER</span></div>
+      <h2>
+        <span class="tr">Yalnızca ajan değil; <span class="accent">sistemin tamamı.</span></span>
+        <span class="en">Not just agents; <span class="accent">the whole system.</span></span>
+      </h2>
+      <p class="lede">
+        <span class="tr">Yapay zekâ yolculuğunun her adımında danışmanlık veriyoruz: stratejiden mimariye, geleneksel kurumsal sistem danışmanlığından klasik yazılım ve servisleştirme ihtiyaçlarına. İhtiyacınız hazır bir ürün değil, size göre kurgulanmış bir sistemse; onu birlikte tasarlarız.</span>
+        <span class="en">We consult at every step of the AI journey: from strategy to architecture, from traditional enterprise system consulting to classic software and servicification needs. If what you need is not an off-the-shelf product but a system designed around you, we design it together.</span>
+      </p>
+      <div class="grid g4">
+        <div class="cell"><span class="no mono"><span class="tr">DANIŞMANLIK</span><span class="en">CONSULTING</span></span>
+          <h3><span class="tr">Uçtan uca akıl ortaklığı</span><span class="en">An end-to-end thinking partner</span></h3>
+          <p><span class="tr">Strateji, mimari, model seçimi, veri ve güvenlik: kararların tamamında satıcıdan bağımsız bir akıl ortağı.</span><span class="en">Strategy, architecture, model selection, data, and security: a vendor-independent thinking partner across every decision.</span></p>
+        </div>
+        <div class="cell"><span class="no mono"><span class="tr">GELİŞTİRME</span><span class="en">DEVELOPMENT</span></span>
+          <h3><span class="tr">Geliştirme ajanlara devredilir</span><span class="en">Development, handed to agents</span></h3>
+          <p><span class="tr">Entegrasyon geliştirmeleri ajanlara devredilebilir; müşteriden dönen hatalar önce ajan tarafından karşılanır, insan yalnızca onaylar.</span><span class="en">Integration work can be handed to agents; customer-reported bugs are met by an agent first, humans only approve.</span></p>
+        </div>
+        <div class="cell"><span class="no mono">INFRA</span>
+          <h3><span class="tr">Size özel altyapı çözümleri</span><span class="en">Infrastructure built for you</span></h3>
+          <p><span class="tr">Azure, AWS ya da tercih ettiğiniz sağlayıcıda: filo yönetimi, dinamik ölçekleme, kurumsal dağıtım, izleme ve GPU destekli model barındırma.</span><span class="en">On Azure, AWS, or the provider you prefer: fleet management, dynamic scaling, enterprise rollout, monitoring, and GPU-backed model hosting.</span></p>
+        </div>
+        <div class="cell"><span class="no mono">COWORK</span>
+          <h3><span class="tr">Size özel cowork platformu</span><span class="en">Your own cowork platform</span></h3>
+          <p><span class="tr">Ekibinizin tüm süreci tek mesajla yönettiği, şirketinize göre kurgulanmış bir çalışma platformu tasarlanabilir.</span><span class="en">A work platform designed around your company, where your team runs the whole process with a single message.</span></p>
+        </div>
+      </div>
+      <div class="chips mono" style="margin-top:14px">
+        <span class="chip"><span class="tr">ÜRETKEN YZ GELİŞTİRME</span><span class="en">GENERATIVE AI DEVELOPMENT</span></span>
+        <span class="chip"><span class="tr">OTONOM AJAN SİSTEMLERİ</span><span class="en">AUTONOMOUS AGENT SYSTEMS</span></span>
+        <span class="chip"><span class="tr">MODEL BARINDIRMA</span><span class="en">MODEL HOSTING</span></span>
+        <span class="chip"><span class="tr">ENDÜSTRİYEL IOT &amp; EDGE</span><span class="en">INDUSTRIAL IOT &amp; EDGE</span></span>
+        <span class="chip"><span class="tr">VERİ &amp; ALTYAPI</span><span class="en">DATA &amp; INFRASTRUCTURE</span></span>
+        <span class="chip"><span class="tr">GÜVENLİK &amp; UYUMLULUK</span><span class="en">SECURITY &amp; COMPLIANCE</span></span>
+        <span class="chip"><span class="tr">DANIŞMANLIK &amp; EĞİTİM</span><span class="en">CONSULTING &amp; TRAINING</span></span>
+      </div>
+    </section>
+
+    <!-- ══════════ 13 · KURUMSAL SİSTEMLER ══════════ -->
+    <section class="slide dense">
+      <div class="kicker mono"><b>13</b> / <span class="tr">KURUMSAL SİSTEMLER</span><span class="en">ENTERPRISE SYSTEMS</span></div>
+      <h2>
+        <span class="tr">Kurumsal sistemler, <span class="accent">ana dilimiz.</span></span>
+        <span class="en">Enterprise systems, <span class="accent">our native tongue.</span></span>
+      </h2>
+      <p class="lede">
+        <span class="tr">Yıllarımız SAP ve Microsoft Dynamics projelerinde geçti: ERP'nin ve CRM'in nasıl yaşadığını, nerede tıkandığını ve neye mal olduğunu sahadan biliyoruz. Bu birikim, yapay zekâ katmanını mevcut sisteminize doğru yerden bağlar; sıfırdan öğrenme maliyetini ödemezsiniz. Ajan katmanı ERP'nizin yanına değil, içine konuşur.</span>
+        <span class="en">We spent years on SAP and Microsoft Dynamics projects: we know from the field how ERP and CRM systems live, where they clog, and what it costs. That experience connects the AI layer to your existing system at exactly the right point; you never pay the learning-from-scratch cost. The agent layer doesn't sit next to your ERP; it speaks from within it.</span>
+      </p>
+      <div class="erpgrid">
+        <article class="erp-card">
+          <span class="mono prod-no">01 / <span class="tr">KURUMSAL ÇEKİRDEK</span><span class="en">THE ENTERPRISE CORE</span></span>
+          <h3 class="erp-name">SAP</h3>
+          <p><span class="tr">Süreç uyarlama, modül geliştirme ve entegrasyon. Ajan katmanı, mevcut SAP yapınızı bozmadan doğru noktadan bağlanır.</span><span class="en">Process adaptation, module development, and integration. The agent layer connects at the right point without disturbing your existing SAP landscape.</span></p>
+          <div class="erp-stat"><b>↓</b><span><span class="tr">GELİŞTİRME MALİYETİ DÜŞER</span><span class="en">DEVELOPMENT COSTS FALL</span></span></div>
+        </article>
+        <article class="erp-card">
+          <span class="mono prod-no">02 / <span class="tr">GÜNLÜK OPERASYON</span><span class="en">DAILY OPERATIONS</span></span>
+          <h3 class="erp-name">NAV / BC</h3>
+          <p><span class="tr">Dynamics NAV ve Business Central'da uyarlama, rapor ve eklenti geliştirme; günlük operasyonun aktığı sistemde hız kazandırır.</span><span class="en">Customization, reporting, and extension development in Dynamics NAV and Business Central; speed where your daily operations flow.</span></p>
+          <div class="erp-stat"><b>↑</b><span><span class="tr">İŞ SÜREÇLERİ HIZLANIR</span><span class="en">BUSINESS PROCESSES SPEED UP</span></span></div>
+        </article>
+        <article class="erp-card">
+          <span class="mono prod-no">03 / <span class="tr">FİNANS VE OPERASYON</span><span class="en">FINANCE &amp; OPERATIONS</span></span>
+          <h3 class="erp-name">F&amp;O</h3>
+          <p><span class="tr">Dynamics 365 Finance &amp; Operations'ta finans ve operasyon süreçlerine uçtan uca danışmanlık ve geliştirme.</span><span class="en">End-to-end consulting and development for finance and operations processes in Dynamics 365 Finance &amp; Operations.</span></p>
+          <div class="erp-stat"><b>1</b><span><span class="tr">TEK ELDEN SORUMLULUK</span><span class="en">A SINGLE POINT OF ACCOUNTABILITY</span></span></div>
+        </article>
+        <article class="erp-card">
+          <span class="mono prod-no">04 / <span class="tr">MÜŞTERİ İLİŞKİLERİ</span><span class="en">CUSTOMER RELATIONS</span></span>
+          <h3 class="erp-name">CRM</h3>
+          <p><span class="tr">Dynamics 365 CRM'de (Sales · Service) uyarlama ve entegrasyon. Müşteri verisi, ajanların en verimli çalıştığı zemindir: kayıtlar güncel kalır, takipler kendiliğinden akar.</span><span class="en">Customization and integration in Dynamics 365 CRM (Sales · Service). Customer data is where agents work best: records stay current, follow-ups flow on their own.</span></p>
+          <div class="erp-stat"><b>↺</b><span><span class="tr">MÜŞTERİ VERİSİ HEP GÜNCEL</span><span class="en">CUSTOMER DATA STAYS CURRENT</span></span></div>
+        </article>
+      </div>
+      <div class="callout" style="margin-top:14px">
+        <span class="tag-mono"><span class="tr">TEK YETKİLİ</span><span class="en">ONE PARTNER</span></span>
+        <span class="tr"><b>Tek yetkili, tek sorumlu, daha düşük maliyet:</b> ERP danışmanlığını, geliştirmeyi ve ajan katmanını tek elden alırsınız. Aradaki her tedarikçi katmanı kalktıkça geliştirme maliyeti düşer, iş süreçleri hızlanır; sorumlu hep aynı masada oturur.</span>
+        <span class="en"><b>One partner, one point of accountability, lower cost:</b> ERP consulting, development, and the agent layer from a single hand. As each middle layer disappears, development costs fall and business processes speed up; the responsible party always sits at the same table.</span>
+      </div>
+    </section>
+
+    <!-- ══════════ 14 · ALTYAPI ÇÖZÜMLERİ ══════════ -->
+    <section class="slide dense">
+      <div class="kicker mono"><b>14</b> / <span class="tr">ALTYAPI ÇÖZÜMLERİ</span><span class="en">INFRASTRUCTURE SOLUTIONS</span></div>
+      <h2>
+        <span class="tr">Size özel altyapı; <span class="accent">sağlayıcıdan bağımsız.</span></span>
+        <span class="en">Infrastructure built for you; <span class="accent">provider-independent.</span></span>
+      </h2>
+      <p class="lede">
+        <span class="tr">Azure'da da AWS'te de aynı disiplin: altyapınızı kod olarak tanımlar, sağlayıcıdan bağımsız kurarız. Bugün Azure'daysanız yarın AWS'e, ya da ikisine birden; mimari sizi hiçbir buluta kilitlemez.</span>
+        <span class="en">The same discipline on Azure and on AWS: we define your infrastructure as code and build it provider-independent. On Azure today, on AWS tomorrow, or both at once; the architecture locks you into no cloud.</span>
+      </p>
+      <div class="grid g4">
+        <div class="cell"><span class="no mono">MULTI-CLOUD</span>
+          <h3><span class="tr">Azure · AWS · dilediğiniz</span><span class="en">Azure · AWS · your pick</span></h3>
+          <p><span class="tr">Sağlayıcıyı iş ihtiyacı belirler; mimari her ikisinde de aynı kalır. Yerinde (on-prem) kurulum da her zaman masada.</span><span class="en">Business needs pick the provider; the architecture stays the same on both. On-premise deployment is always on the table.</span></p>
+        </div>
+        <div class="cell"><span class="no mono">FLEET</span>
+          <h3><span class="tr">Filo yönetimi</span><span class="en">Fleet management</span></h3>
+          <p><span class="tr">Yüzlerce cihaz ve ajan tek panelden: sürüm dağıtımı, sağlık takibi, uzaktan müdahale. Saha kiosk'larından bulut ajanlarına aynı filo düzeni.</span><span class="en">Hundreds of devices and agents from one panel: version rollout, health tracking, remote intervention. The same fleet discipline from field kiosks to cloud agents.</span></p>
+        </div>
+        <div class="cell"><span class="no mono">SCALE</span>
+          <h3><span class="tr">Dinamik ölçekleme</span><span class="en">Dynamic scaling</span></h3>
+          <p><span class="tr">Yük arttıkça kaynak otomatik büyür, boşta küçülür; kapasiteye değil kullanıma ödersiniz. Ajan iş yükleri için ayarlanmış ölçekleme eğrileri.</span><span class="en">Resources grow with load and shrink when idle; you pay for usage, not capacity. Scaling curves tuned for agent workloads.</span></p>
+        </div>
+        <div class="cell"><span class="no mono">IAC</span>
+          <h3><span class="tr">Kod olarak altyapı</span><span class="en">Infrastructure as code</span></h3>
+          <p><span class="tr">Tüm altyapı kod olarak durur (OpenTofu): denetlenebilir, tekrarlanabilir, felakette dakikalar içinde yeniden kurulabilir.</span><span class="en">All infrastructure lives as code (OpenTofu): auditable, repeatable, and rebuildable in minutes after a disaster.</span></p>
+        </div>
+      </div>
+      <div class="callout">
+        <span class="tag-mono"><span class="tr">SİZE ÖZEL</span><span class="en">BUILT FOR YOU</span></span>
+        <span class="tr"><b>Hazır şablon değil, size özel kurgu:</b> mevcut abonelikleriniz, güvenlik politikanız ve bütçenize göre tasarlanır; maliyet görünürlüğü ilk günden kurulur, sürpriz fatura kalmaz.</span>
+        <span class="en"><b>Not a template, a design for you:</b> built around your existing subscriptions, security policy, and budget; cost visibility is set up from day one, so there are no surprise bills.</span>
+      </div>
+    </section>
+
+    <!-- ══════════ 15 · ENDÜSTRİYEL OPERASYON ══════════ -->
+    <section class="slide">
+      <div class="kicker mono"><b>15</b> / <span class="tr">ENDÜSTRİYEL OPERASYON</span><span class="en">INDUSTRIAL OPERATIONS</span></div>
+      <h2>
+        <span class="tr">Fabrika sahası: tüm makineler, <span class="accent">tek zemin.</span></span>
+        <span class="en">The factory floor: every machine, <span class="accent">one foundation.</span></span>
+      </h2>
+      <p class="lede">
+        <span class="tr">Fabrikada işimiz masa başında değil, sahada başlar. Siemens'in hesabıyla plansız duruşlar dünyanın en büyük 500 şirketine yılda 1,4 trilyon dolara, gelirlerin %11'ine mal oluyor. Biz operatör iş akışları için donanımı tasarlıyor, üretiyor ve kuruyoruz: makineler tek makineye bağlanır, ajanlar süreç ve anomalileri izler; operasyon adım adım, kontrol sizde kalarak devredilir.</span>
+        <span class="en">On the factory floor, our work starts in the field, not at a desk. By Siemens' count, unplanned downtime costs the world's 500 largest companies $1.4 trillion a year, 11% of revenues. We design, build, and install the hardware for operator workflows: machines connect to one machine, agents track the process and its anomalies; the operation is handed over step by step, with control staying yours.</span>
+      </p>
+      <div class="two-col" style="align-items:start; margin-top:6px">
+        <div class="layers" style="margin-top:14px">
+          <div class="layer"><span class="tr">SAHA MAKİNELERİ</span><span class="en">FIELD MACHINES</span><small class="tr">OPERATÖRÜN KULLANDIĞI EKİPMAN</small><small class="en">THE OPERATOR'S EQUIPMENT</small></div>
+          <div class="layer hot"><span class="tr">TEK MAKİNE · EDGE</span><span class="en">ONE MACHINE · EDGE</span><small class="tr">TÜM EKİPMAN TEK NOKTAYA BAĞLANIR</small><small class="en">ALL EQUIPMENT, ONE POINT</small></div>
+          <div class="layer"><span class="tr">AJANLAR</span><span class="en">AGENTS</span><small class="tr">SÜREÇ · ANOMALİ TAKİBİ</small><small class="en">PROCESS · ANOMALY TRACKING</small></div>
+          <div class="layer"><span class="tr">OPERASYON</span><span class="en">OPERATIONS</span><small class="tr">RAPOR · MÜDAHALE · KAYIT</small><small class="en">REPORT · ACTION · RECORD</small></div>
+        </div>
+        <div class="rows" style="margin-top:14px">
+          <div class="row"><span class="row-no mono">A</span>
+            <span class="row-main"><b><span class="tr">Donanım bizim işimiz</span><span class="en">Hardware is our craft</span></b>
+            <small><span class="tr">Sahadaki donanımı raftan almayız; operatör iş süreçleri için kendimiz tasarlar, üretir ve kurarız.</span><span class="en">We don't take field hardware off a shelf; we design, build, and install it ourselves for operator workflows.</span></small></span>
+          </div>
+          <div class="row"><span class="row-no mono">B</span>
+            <span class="row-main"><b><span class="tr">Anomali gözden kaçmaz</span><span class="en">No anomaly slips through</span></b>
+            <small><span class="tr">Ajanlar üretim akışını sürekli izler; sapmalar anında raporlanır, tanımlı sınırlar içinde müdahale edilir. Plansız duruş dakikadır, dakika paradır: erken yakalanan her anomali OEE'ye doğrudan yazar.</span><span class="en">Agents watch the production flow continuously; deviations are reported instantly and handled within defined limits. Unplanned downtime is minutes, and minutes are money: every anomaly caught early goes straight to your OEE.</span></small></span>
+          </div>
+          <div class="row"><span class="row-no mono">C</span>
+            <span class="row-main"><b><span class="tr">Adım adım devir</span><span class="en">Handover, step by step</span></b>
+            <small><span class="tr">Sistem önce izler, sonra önerir, en sonunda devralır; kontrol her aşamada sizde kalır.</span><span class="en">The system first watches, then suggests, finally takes over; you stay in control at every stage.</span></small></span>
+          </div>
+          <div class="row"><span class="row-no mono">D</span>
+            <span class="row-main"><b><span class="tr">Kiosk cihazları, native yazılım</span><span class="en">Kiosk devices, native software</span></b>
+            <small><span class="tr">Operatör kiosk'larına yönelik aktif geliştirme sürecimiz var; arayüzleri deneyimli ekibimiz native geliştirir: web sarmalayıcı değil, cihazdan tam performans.</span><span class="en">We run an active development line for operator kiosks; our experienced team builds the interfaces natively: no web wrappers, full performance from the device.</span></small></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ 16 · NATİVE GELİŞTİRME ══════════ -->
+    <section class="slide dense">
+      <div class="kicker mono"><b>16</b> / <span class="tr">NATİVE GELİŞTİRME</span><span class="en">NATIVE DEVELOPMENT</span></div>
+      <h2>
+        <span class="tr">Her cihaza, <span class="accent">kendi dilinde.</span></span>
+        <span class="en">Every device, <span class="accent">in its own language.</span></span>
+      </h2>
+      <p class="lede">
+        <span class="tr">Uygulamayı tek kod tabanına sıkıştıran çatılar kâğıt üstünde ucuzdur; faturası sahada gelir. Airbnb iki yıllık yatırımın ardından 2018'de React Native'i bıraktı; Dropbox 2019'da ortak kod tabanını "aynı kodu iki kez yazmaktan daha pahalı" bularak terk etti. Biz o faturayı baştan keseriz: her platformda o platformun kendi araçlarıyla, cihazın ihtiyacına göre geliştiririz.</span>
+        <span class="en">Frameworks that squeeze an app into one codebase look cheap on paper; the bill arrives in the field. Airbnb dropped React Native in 2018 after two years of investment; Dropbox abandoned its shared codebase in 2019, finding it "more expensive than writing the code twice". We cut that bill up front: on every platform, with that platform's own tools, built to the device's needs.</span>
+      </p>
+      <div class="grid g4">
+        <div class="cell"><span class="no mono">iOS</span>
+          <h3><span class="tr">Swift &amp; SwiftUI</span><span class="en">Swift &amp; SwiftUI</span></h3>
+          <p><span class="tr">Apple ekosisteminde birinci sınıf vatandaş: yeni işletim sistemi özellikleri çıktığı gün ürününüzde, arayüz platformun kendi hissiyatında.</span><span class="en">A first-class citizen of the Apple ecosystem: new OS features land in your product on day one, and the interface feels like the platform itself.</span></p>
+        </div>
+        <div class="cell"><span class="no mono">ANDROID</span>
+          <h3><span class="tr">Kotlin &amp; Compose</span><span class="en">Kotlin &amp; Compose</span></h3>
+          <p><span class="tr">Telefondan tablete, Android tabanlı kiosk'lara: kamera, NFC, BLE ve seri porta doğrudan erişim; kısıtlı donanımda bile akıcı arayüz.</span><span class="en">From phones to tablets to Android-based kiosks: direct access to camera, NFC, BLE, and serial ports; a fluid interface even on constrained hardware.</span></p>
+        </div>
+        <div class="cell"><span class="no mono">WEB</span>
+          <h3><span class="tr">Web, gerektiği yerde</span><span class="en">Web, where it belongs</span></h3>
+          <p><span class="tr">Erişim öncelikliyse doğru araç web'dir; onu da aynı disiplinle yazarız. Seçimi ideoloji değil, cihazın ihtiyacı ve kullanım senaryosu belirler.</span><span class="en">When reach comes first, the web is the right tool; we build it with the same discipline. Ideology doesn't pick the stack; the device's needs and the usage scenario do.</span></p>
+        </div>
+        <div class="cell"><span class="no mono"><span class="tr">MASAÜSTÜ</span><span class="en">DESKTOP</span></span>
+          <h3><span class="tr">macOS · Windows · Linux</span><span class="en">macOS · Windows · Linux</span></h3>
+          <p><span class="tr">Kurum içi araçlardan operatör konsollarına: macOS'ta Swift, Windows'ta WinUI/.NET, Linux'ta native. Electron şişkinliği yok; hafif, hızlı, sisteme entegre.</span><span class="en">From internal tools to operator consoles: Swift on macOS, WinUI/.NET on Windows, native on Linux. No Electron bloat; light, fast, integrated with the OS.</span></p>
+        </div>
+      </div>
+      <div class="callout">
+        <span class="tag-mono"><span class="tr">SEKTÖR DERSİ</span><span class="en">INDUSTRY LESSON</span></span>
+        <span class="tr"><b>Devler denedi, geri döndü:</b> Airbnb (2018) ve Dropbox (2019) çapraz platform maceralarını sonlandırıp native'e döndü. Sebep yalnız performans değil, ekonomiydi: bakım yükü, geciken platform özellikleri, iki dünyada birden uzman tutma zorunluluğu. Deneyimli ekibimiz bu dersi ilk günden uygular: arada çeviri katmanı yok; açılış, animasyon, pil ve bellek platform sınırında. Operatör cihazında bu, vardiya boyu fark demektir.</span>
+        <span class="en"><b>The giants tried it and turned back:</b> Airbnb (2018) and Dropbox (2019) ended their cross-platform runs and returned to native. The reason wasn't just performance; it was economics: maintenance burden, delayed platform features, and having to staff experts in both worlds anyway. Our experienced team applies that lesson from day one: no translation layer in between; startup, animation, battery, and memory at the platform's limit. On an operator device, that's a difference you feel all shift long.</span>
+      </div>
+    </section>
+
+    <!-- ══════════ 17 · ÇALIŞMA MODELİ ══════════ -->
+    <section class="slide">
+      <div class="kicker mono"><b>17</b> / <span class="tr">ÇALIŞMA MODELİMİZ</span><span class="en">HOW WE WORK</span></div>
+      <h2>
+        <span class="tr">Fikirden üretime, <span class="accent">yanınızdayız.</span></span>
+        <span class="en">From idea to production, <span class="accent">we're with you.</span></span>
+      </h2>
+      <p class="lede">
+        <span class="tr">Kapsam ne olursa olsun disiplin aynı: küçük başla, ölç, kanıtla, büyüt. Her adımda masada çekirdeği yazan deneyimli ekip oturur; native geliştirir, performanstan ödün vermez.</span>
+        <span class="en">Whatever the scope, the discipline is the same: start small, measure, prove, scale. At every step, the experienced team that writes the kernel is at the table; building natively, with no performance compromise.</span>
+      </p>
+      <div class="grid g4">
+        <div class="cell"><span class="no mono">01 / <span class="tr">KEŞİF</span><span class="en">DISCOVERY</span></span>
+          <h3><span class="tr">Strateji oturumu</span><span class="en">Strategy session</span></h3>
+          <p><span class="tr">Süreçlerinizi birlikte inceler, otomasyon potansiyeli en yüksek işleri ve başarı ölçütlerini belirleriz. İlk keşif görüşmesi ücretsizdir.</span><span class="en">We review your processes together and identify the highest-potential work and success metrics. The first discovery call is free.</span></p>
+        </div>
+        <div class="cell"><span class="no mono">02 / <span class="tr">PİLOT</span><span class="en">PILOT</span></span>
+          <h3><span class="tr">Pilot proje</span><span class="en">Pilot project</span></h3>
+          <p><span class="tr">Haftalar içinde, gerçek verinizle çalışan dar kapsamlı bir pilot kurulur; devam kararı ölçülen sonuçlara göre birlikte verilir.</span><span class="en">Within weeks, a tightly scoped pilot runs on your real data; the decision to continue is made together, on measured results.</span></p>
+        </div>
+        <div class="cell"><span class="no mono">03 / <span class="tr">ÜRETİM</span><span class="en">PRODUCTION</span></span>
+          <h3><span class="tr">Üretime alma</span><span class="en">Go-live</span></h3>
+          <p><span class="tr">Pilot; güvenlik, onay akışları, izleme ve SLA ile üretim ortamınıza taşınır.</span><span class="en">The pilot moves to production with security, approval flows, monitoring, and an SLA.</span></p>
+        </div>
+        <div class="cell"><span class="no mono">04 / <span class="tr">İŞLETİM</span><span class="en">OPERATE</span></span>
+          <h3><span class="tr">Sürekli iyileştirme</span><span class="en">Continuous improvement</span></h3>
+          <p><span class="tr">İzleme, maliyet raporları ve sürekli mühendislik kapasitesiyle çözüm birlikte büyütülür.</span><span class="en">With monitoring, cost reports, and ongoing engineering capacity, the solution grows over time.</span></p>
+        </div>
+      </div>
+      <div class="chips mono" style="margin-top:18px">
+        <span class="chip"><span class="tr">PİLOTTA SABİT KAPSAM, SABİT FİYAT</span><span class="en">FIXED SCOPE, FIXED PRICE PILOTS</span></span>
+        <span class="chip"><span class="tr">HAFTALIK DEMO</span><span class="en">WEEKLY DEMOS</span></span>
+        <span class="chip"><span class="tr">KAYNAK KOD SİZDE KALIR</span><span class="en">YOU KEEP THE SOURCE</span></span>
+        <span class="chip"><span class="tr">SLA'LI İŞLETİM</span><span class="en">SLA-BACKED OPERATIONS</span></span>
+      </div>
+      <p class="fine" style="margin-top:12px">
+        <span class="tr">Kaliteyi korumak için aynı anda sınırlı sayıda pilot yürütürüz; takvim sırayla işler.</span>
+        <span class="en">To protect quality, we run a limited number of pilots at a time; the calendar works first come, first served.</span>
+      </p>
+    </section>
+
+    <!-- ══════════ 18 · TANIŞALIM ══════════ -->
+    <section class="slide center-slide">
+      <div class="kicker mono"><b>18</b> / <span class="tr">TANIŞALIM</span><span class="en">LET'S MEET</span></div>
+      <h2 style="font-size:clamp(34px,4.6vw,58px)">
+        <span class="tr">Tanışmak için <span class="accent">sabırsızlanıyoruz.</span></span>
+        <span class="en">We can't wait to <span class="accent">meet you.</span></span>
+      </h2>
+      <p class="lede">
+        <span class="tr">Bu işi tutkuyla yapıyoruz: çekirdekten donanıma, sahadan buluta. Sizin süreçlerinizi dinlemek, doğru sistemi birlikte tasarlamak ve onu üretimde çalışırken izlemek; bizim için işin en keyifli kısmı. Kapımız açık, kahve hazır.</span>
+        <span class="en">We do this work with passion: from the kernel to the hardware, from the field to the cloud. Hearing your processes, designing the right system together, and watching it run in production is the part we love most. Our door is open, the coffee is ready.</span>
+      </p>
+      <div class="chips mono" style="justify-content:center; margin-top:4px">
+        <span class="chip"><span class="tr">RUTİN İŞLEMLERDE 50×'E VARAN MALİYET FARKI</span><span class="en">UP TO 50× COST SAVINGS ON ROUTINE WORK</span></span>
+        <span class="chip"><span class="tr">1 KİŞİ + YZ ≈ 2 KİŞİLİK TAKIM</span><span class="en">1 PERSON + AI ≈ A TEAM OF TWO</span></span>
+        <span class="chip"><span class="tr">KONTROL, İLK GÜNDEN TASARIMDA</span><span class="en">CONTROL, BY DESIGN FROM DAY ONE</span></span>
+      </div>
+      <div class="cta-box" style="justify-content:center">
+        <div id="mfxRoot" class="mfx-slot">
+          <a class="mfx-host" href="mailto:hello@cogitave.com?subject=Tan%C4%B1%C5%9Fma%20talebi%20(namzu%20sunumu)"><span class="tr">Tanışalım</span><span class="en">Let's talk</span></a>
+        </div>
+        <a class="btn btn-ghost mono" href="https://github.com/cogitave/namzu" target="_blank" rel="noopener">github.com/cogitave/namzu</a>
+      </div>
+      <div class="cta-links mono" style="justify-content:center">
+        <a href="https://cogitave.com">COGITAVE.COM</a>
+        <a href="mailto:hello@cogitave.com?subject=Tan%C4%B1%C5%9Fma%20talebi%20(namzu%20sunumu)">HELLO@COGITAVE.COM</a>
+        <span class="tr">KOCAELİ · TR</span><span class="en">KOCAELI · TR</span>
+      </div>
+      <div class="qr-wrap"><svg class="qr" width="84" height="84" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 33 33" shape-rendering="crispEdges"><path stroke="#0a0a0f" d="M0 0.5h7m1 0h2m2 0h1m1 0h1m3 0h1m3 0h1m3 0h7M0 1.5h1m5 0h1m1 0h1m1 0h1m6 0h1m1 0h1m2 0h1m1 0h1m1 0h1m5 0h1M0 2.5h1m1 0h3m1 0h1m1 0h1m1 0h1m1 0h1m2 0h1m1 0h2m1 0h3m3 0h1m1 0h3m1 0h1M0 3.5h1m1 0h3m1 0h1m2 0h4m6 0h1m1 0h1m2 0h1m1 0h1m1 0h3m1 0h1M0 4.5h1m1 0h3m1 0h1m1 0h1m2 0h1m1 0h3m2 0h1m1 0h2m4 0h1m1 0h3m1 0h1M0 5.5h1m5 0h1m2 0h1m1 0h4m5 0h1m1 0h2m2 0h1m5 0h1M0 6.5h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7M9 7.5h2m2 0h1m4 0h3m1 0h1M0 8.5h1m2 0h7m2 0h1m1 0h2m1 0h1m1 0h1m3 0h1m1 0h1m2 0h1m1 0h3M1 9.5h2m1 0h2m3 0h1m4 0h2m2 0h3m2 0h1m4 0h3M1 10.5h1m1 0h1m2 0h3m3 0h1m1 0h5m2 0h3m1 0h1m2 0h3m1 0h1M0 11.5h1m1 0h4m2 0h3m3 0h2m1 0h1m2 0h1m2 0h3m1 0h1m2 0h2M0 12.5h3m3 0h1m3 0h5m1 0h3m1 0h1m3 0h1m1 0h2M0 13.5h2m1 0h2m2 0h5m1 0h1m2 0h1m2 0h1m2 0h2m1 0h1m3 0h1M0 14.5h2m1 0h2m1 0h2m1 0h2m1 0h1m3 0h1m1 0h1m7 0h2m1 0h2M1 15.5h4m7 0h1m1 0h2m3 0h1m2 0h1m2 0h1m1 0h1m1 0h2m1 0h1M1 16.5h2m2 0h2m1 0h3m1 0h3m4 0h2m1 0h8M1 17.5h1m3 0h1m1 0h1m1 0h1m2 0h1m2 0h1m2 0h3m1 0h1m3 0h1m1 0h1m1 0h1m1 0h1M0 18.5h1m1 0h1m2 0h3m2 0h6m3 0h1m2 0h2m1 0h3m1 0h2m1 0h1M1 19.5h4m3 0h1m1 0h3m3 0h3m4 0h1m4 0h3M2 20.5h3m1 0h1m1 0h3m3 0h1m5 0h1m6 0h1m1 0h1m2 0h1M0 21.5h3m2 0h1m1 0h1m1 0h2m5 0h3m1 0h1m1 0h2m3 0h2m1 0h1M0 22.5h1m1 0h1m2 0h2m6 0h5m3 0h4m1 0h1m3 0h3M0 23.5h1m6 0h1m1 0h2m1 0h1m1 0h1m1 0h2m6 0h3m1 0h1m1 0h1M0 24.5h2m2 0h1m1 0h1m2 0h1m1 0h1m3 0h2m2 0h2m1 0h1m1 0h6m1 0h2M8 25.5h5m1 0h2m5 0h1m2 0h1m3 0h1m1 0h2M0 26.5h7m1 0h3m1 0h4m2 0h7m1 0h1m1 0h1m1 0h1M0 27.5h1m5 0h1m1 0h1m3 0h1m1 0h1m4 0h2m2 0h2m3 0h3M0 28.5h1m1 0h3m1 0h1m1 0h1m2 0h1m2 0h2m1 0h2m1 0h2m1 0h6m2 0h1M0 29.5h1m1 0h3m1 0h1m1 0h5m1 0h1m5 0h3m2 0h1m1 0h1m1 0h1m1 0h2M0 30.5h1m1 0h3m1 0h1m3 0h1m3 0h1m1 0h1m1 0h1m1 0h1m4 0h1m1 0h3m1 0h2M0 31.5h1m5 0h1m2 0h8m1 0h1m4 0h1m3 0h6M0 32.5h7m1 0h1m1 0h5m2 0h1m5 0h2m1 0h3"/></svg><span class="mono qr-cap"><span class="tr">TELEFONLA TARAYIN</span><span class="en">SCAN WITH YOUR PHONE</span></span></div>
+      <p class="lede" style="margin-top:28px; font-size:12px; color:var(--text-faint); max-width:none">
+        <span class="tr">namzu bugün hizmette; ekosistem yuva ve cogi ile büyümeye devam ediyor.</span>
+        <span class="en">namzu is available today; the ecosystem keeps growing with yuva and cogi.</span>
+      </p>
+    </section>
+  </main>
+
+  <footer class="bottombar">
+    <span class="mono bb-copy">© 2026 COGITAVE YAZILIM VE DANIŞMANLIK LTD. ŞTİ.</span>
+    <div class="dots" id="dots" aria-label="Slaytlar"></div>
+    <div class="navgrp">
+      <button class="nbtn mono" id="prev" aria-label="Önceki">←&nbsp;<span class="tr">GERİ</span><span class="en">BACK</span></button>
+      <span class="mono counter" id="counter">01 / 18</span>
+      <button class="nbtn mono" id="next" aria-label="Sonraki"><span class="tr">İLERİ</span><span class="en">NEXT</span>&nbsp;→</button>
+    </div>
+  </footer>
+</div>
+
+<script>
+/* ============================================================
+   Akışkan "liquid aurora" arka planı — WebGL2, fullscreen triangle,
+   fbm domain-warp + 8x8 Bayer sıralı dither. (siteyle aynı shader)
+   ============================================================ */
+(function () {
+  var canvas = document.getElementById('gl');
+  var gl = canvas.getContext('webgl2', { antialias: false, depth: false, stencil: false, powerPreference: 'high-performance' });
+  function fallback() { canvas.style.display = 'none'; document.body.classList.add('no-gl'); }
+  if (!gl) { fallback(); return; }
+
+  var VERT = '#version 300 es\n' +
+    'void main(){vec2 v=vec2((gl_VertexID<<1)&2,gl_VertexID&2);gl_Position=vec4(v*2.0-1.0,0.0,1.0);}';
+
+  /* ASCII akış: aynı fbm alanı, dither noktaları yerine karakter rampası
+     ( boş · : + = 0 8 # ) ile çizilir — 4x5 bit-glifler, doku yok. */
+  var FRAG = '#version 300 es\n' +
+    'precision highp float;\n' +
+    'uniform vec2 u_res;uniform float u_time;uniform vec2 u_mouse;uniform float u_intro;\n' +
+    'out vec4 fragColor;\n' +
+    'float hash(vec2 p){p=fract(p*vec2(123.34,456.21));p+=dot(p,p+45.32);return fract(p.x*p.y);}\n' +
+    'float noise(vec2 p){vec2 i=floor(p),f=fract(p);vec2 u=f*f*(3.0-2.0*f);\n' +
+    'return mix(mix(hash(i),hash(i+vec2(1.0,0.0)),u.x),mix(hash(i+vec2(0.0,1.0)),hash(i+vec2(1.0,1.0)),u.x),u.y);}\n' +
+    'float fbm(vec2 p){float v=0.0,a=0.5;mat2 m=mat2(1.6,1.2,-1.2,1.6);\n' +
+    'for(int i=0;i<4;i++){v+=a*noise(p);p=m*p;a*=0.5;}return v;}\n' +
+    'float lum(vec2 fragXY){\n' +
+    'vec2 uv=(fragXY*2.0-u_res)/min(u_res.x,u_res.y);\n' +
+    'float t=u_time*0.05;vec2 mo=u_mouse*0.3;\n' +
+    'vec2 p=uv*1.25+mo*0.35;\n' +
+    'vec2 q=vec2(fbm(p+t),fbm(p+vec2(5.2,1.3)-t*0.8));\n' +
+    'vec2 r=vec2(fbm(p+2.0*q+vec2(1.7,9.2)+0.3*t+mo*0.6),fbm(p+2.2*q+vec2(8.3,2.8)-0.26*t));\n' +
+    'float f=fbm(p+2.6*r);\n' +
+    'float l=smoothstep(0.24,0.95,f)*0.95;\n' +
+    'vec2 g=uv-vec2(0.55,-0.15)-mo*0.2;\n' +
+    'l+=exp(-2.4*dot(g,g))*0.12;\n' +
+    'l*=smoothstep(1.9,0.35,length(uv*vec2(0.8,1.0)));\n' +
+    'return clamp(l,0.0,1.0);}\n' +
+    '/* 4x5 glifler, satirlar ustten 4er bit: bos · : + = 0 8 # */\n' +
+    'int glyphBits(int gi){\n' +
+    'if(gi<=0)return 0;\n' +
+    'if(gi==1)return (0<<16)|(0<<12)|(6<<8)|(0<<4)|0;\n' +
+    'if(gi==2)return (6<<16)|(0<<12)|(0<<8)|(6<<4)|0;\n' +
+    'if(gi==3)return (0<<16)|(4<<12)|(14<<8)|(4<<4)|0;\n' +
+    'if(gi==4)return (0<<16)|(14<<12)|(0<<8)|(14<<4)|0;\n' +
+    'if(gi==5)return (6<<16)|(9<<12)|(9<<8)|(9<<4)|6;\n' +
+    'if(gi==6)return (6<<16)|(9<<12)|(6<<8)|(9<<4)|6;\n' +
+    'return (10<<16)|(15<<12)|(10<<8)|(15<<4)|10;}\n' +
+    'void main(){\n' +
+    'vec2 CELL=vec2(7.0,9.0);\n' +
+    'vec2 cell=floor(gl_FragCoord.xy/CELL);\n' +
+    'vec2 cc=(cell+0.5)*CELL;\n' +
+    'float l=lum(cc);\n' +
+    'float jitter=(hash(cell)-0.5)*0.12;\n' +
+    'float flick=step(0.985,hash(cell+floor(u_time*2.0)))*0.14;\n' +
+    'float ll=clamp(l+jitter+flick,0.0,1.0);\n' +
+    'int gi=int(floor(ll*7.999));\n' +
+    'vec2 sub=floor((gl_FragCoord.xy-cell*CELL)/(CELL/vec2(5.0,6.0)));\n' +
+    'int gx=int(sub.x);int gyUp=int(sub.y);\n' +
+    'float on=0.0;\n' +
+    'if(gx<4&&gyUp<5){int row=(glyphBits(gi)>>(gyUp*4))&15;on=float((row>>(3-gx))&1);}\n' +
+    'vec3 c0=vec3(0.014,0.015,0.022);\n' +
+    'vec3 c1=vec3(0.065,0.07,0.095);\n' +
+    'vec3 c2=vec3(0.16,0.17,0.215);\n' +
+    'vec3 c3=vec3(0.30,0.295,0.27);\n' +
+    'vec3 ink=mix(c1,c2,smoothstep(0.15,0.55,l));\n' +
+    'ink=mix(ink,c3,smoothstep(0.55,0.95,l));\n' +
+    'vec3 col=mix(c0,ink,on);\n' +
+    'float gr=hash(gl_FragCoord.xy+fract(u_time)*61.7);\n' +
+    'col+=(gr-0.5)*0.02;\n' +
+    'col*=u_intro;\n' +
+    'fragColor=vec4(col,1.0);}';
+
+  function compile(type, src) {
+    var s = gl.createShader(type);
+    gl.shaderSource(s, src); gl.compileShader(s);
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) { return null; }
+    return s;
+  }
+  var vs = compile(gl.VERTEX_SHADER, VERT);
+  var fs = compile(gl.FRAGMENT_SHADER, FRAG);
+  if (!vs || !fs) { fallback(); return; }
+  var prog = gl.createProgram();
+  gl.attachShader(prog, vs); gl.attachShader(prog, fs); gl.linkProgram(prog);
+  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) { fallback(); return; }
+  gl.useProgram(prog);
+
+  var uRes = gl.getUniformLocation(prog, 'u_res');
+  var uTime = gl.getUniformLocation(prog, 'u_time');
+  var uMouse = gl.getUniformLocation(prog, 'u_mouse');
+  var uIntro = gl.getUniformLocation(prog, 'u_intro');
+
+  var reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var DPR = Math.min(devicePixelRatio || 1, 1.5) * 0.66;
+
+  var w = 0, h = 0;
+  function resize() {
+    w = Math.round(innerWidth * DPR);
+    h = Math.round(innerHeight * DPR);
+    canvas.width = w; canvas.height = h;
+    gl.viewport(0, 0, w, h);
+  }
+  resize();
+  addEventListener('resize', resize);
+
+  var mx = 0, my = 0, tx = 0, ty = 0;
+  addEventListener('pointermove', function (e) {
+    tx = (e.clientX / innerWidth) * 2 - 1;
+    ty = -((e.clientY / innerHeight) * 2 - 1);
+  }, { passive: true });
+
+  var intro = 0, introTarget = 1;
+  var start = performance.now();
+  function frame(now) {
+    var t = (now - start) / 1000;
+    mx += (tx - mx) * 0.045;
+    my += (ty - my) * 0.045;
+    intro += (introTarget - intro) * 0.035;
+    gl.uniform2f(uRes, w, h);
+    gl.uniform1f(uTime, reducedMotion ? 0 : t);
+    gl.uniform2f(uMouse, reducedMotion ? 0 : mx, reducedMotion ? 0 : my);
+    gl.uniform1f(uIntro, intro);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+
+/* ============================================================
+   Terminal simülasyonu — temsilî namzu çalıştırması, dil duyarlı
+   ============================================================ */
+(function () {
+  var body = document.getElementById('termBody');
+  if (!body) return;
+  var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var LINES = {
+    tr: [
+      ['cmd',  '$ namzu run fatura-akisi', ''],
+      ['ok',   '▸ ajan başladı', 'sandbox: yuva · bütçe: $2.00'],
+      ['ok',   '▸ araç: pdf.oku', 'ok · 1.2s'],
+      ['ok',   '▸ araç: politika.kontrol', 'ok · 0.4s'],
+      ['wait', '▸ araç: erp.kaydet', 'insan onayı bekleniyor…'],
+      ['ok',   '✓ onaylandı', 'operator@sirket'],
+      ['ok',   '✓ tamamlandı', 'maliyet: $0.31 · 14 olay kayıtlı'],
+    ],
+    en: [
+      ['cmd',  '$ namzu run invoice-flow', ''],
+      ['ok',   '▸ agent started', 'sandbox: yuva · budget: $2.00'],
+      ['ok',   '▸ tool: pdf.read', 'ok · 1.2s'],
+      ['ok',   '▸ tool: policy.check', 'ok · 0.4s'],
+      ['wait', '▸ tool: erp.post', 'awaiting human approval…'],
+      ['ok',   '✓ approved', 'operator@company'],
+      ['ok',   '✓ done', 'cost: $0.31 · 14 events recorded'],
+    ],
+  };
+
+  var timer = null;
+
+  function lang() { return document.body.classList.contains('lang-en') ? 'en' : 'tr'; }
+
+  function render() {
+    clearTimeout(timer);
+    body.innerHTML = '';
+    var lines = LINES[lang()];
+    var els = lines.map(function (l) {
+      var d = document.createElement('div');
+      d.className = 'tl ' + l[0];
+      d.innerHTML = '<span class="tl-l"></span><span class="tl-r"></span>';
+      d.firstChild.textContent = l[1];
+      d.lastChild.textContent = l[2];
+      body.appendChild(d);
+      return d;
+    });
+    if (reduced) { els.forEach(function (e) { e.classList.add('on'); }); return; }
+    var i = 0;
+    (function step() {
+      if (i < els.length) {
+        els[i].classList.add('on');
+        /* onay satırında bekle — insan onayı hissi */
+        var delay = els[i].classList.contains('wait') ? 1500 : 420;
+        i++;
+        timer = setTimeout(step, delay);
+      } else {
+        timer = setTimeout(render, 4200); /* döngü */
+      }
+    })();
+  }
+
+  render();
+  new MutationObserver(render).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+})();
+
+/* ============================================================
+   Slayt gezinme + i18n + typewriter
+   ============================================================ */
+(function () {
+  var slides = [].slice.call(document.querySelectorAll('.slide'));
+  var dotsEl = document.getElementById('dots');
+  var counter = document.getElementById('counter');
+  var bar = document.getElementById('bar');
+  var i = 0;
+
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+
+  /* slayt içeriğini kademeli getir (anime.js varsa; yoksa sessizce atla) */
+  var animReduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function animateSlide(slide) {
+    if (animReduced || !window.anime || !window.anime.animate) return;
+    var t = slide.querySelectorAll(
+      '.kicker, h2, .lede, .grid .cell, .rows .row, .layers .layer, .arch > *, ' +
+      '.statband .stat, .prodgrid > *, .erpgrid > *, .callout, .chips, .term, ' +
+      '.cta-box, .cta-links, .bar-row, .fine'
+    );
+    if (!t.length) return;
+    window.anime.animate(t, {
+      opacity: [0, 1],
+      translateY: [12, 0],
+      duration: 420,
+      delay: window.anime.stagger(36),
+      ease: 'outQuad',
+    });
+  }
+
+  slides.forEach(function (_, k) {
+    var d = document.createElement('button');
+    d.className = 'dot' + (k === 0 ? ' on' : '');
+    d.setAttribute('aria-label', 'Slayt ' + (k + 1));
+    d.addEventListener('click', function () { go(k); });
+    dotsEl.appendChild(d);
+  });
+  var dots = [].slice.call(dotsEl.children);
+
+  function go(n) {
+    if (n < 0 || n >= slides.length) return;
+    slides[i].classList.remove('active');
+    dots[i].classList.remove('on');
+    i = n;
+    slides[i].classList.add('active');
+    dots[i].classList.add('on');
+    counter.textContent = pad(i + 1) + ' / ' + pad(slides.length);
+    bar.style.width = ((i + 1) / slides.length * 100) + '%';
+    scrollTo(0, 0); /* mobil akış düzeninde yeni slayt tepeden başlasın */
+    animateSlide(slides[i]);
+  }
+  addEventListener('load', function () { animateSlide(slides[i]); });
+
+  /* ilk açılış ipucu: kapakta göster, ilk gezinmede ya da 6 sn sonra sön */
+  var hint = document.createElement('div');
+  hint.className = 'nav-hint mono';
+  hint.innerHTML =
+    '<span class="hint-desk"><span class="tr">→ TUŞU YA DA KAYDIRARAK İLERLEYİN</span><span class="en">USE → OR SWIPE TO CONTINUE</span></span>' +
+    '<span class="hint-mob"><span class="tr">KAYDIRARAK İLERLEYİN</span><span class="en">SWIPE TO CONTINUE</span></span>';
+  document.body.appendChild(hint);
+  var hintOff = function () {
+    hint.classList.add('off');
+    setTimeout(function () { hint.remove(); }, 700);
+    hintOff = function () {};
+  };
+  setTimeout(function () { hintOff(); }, 6000);
+  var _go = go;
+  go = function (n) { hintOff(); _go(n); };
+  bar.style.width = (1 / slides.length * 100) + '%';
+
+  document.getElementById('next').addEventListener('click', function () { go(i + 1); });
+  document.getElementById('prev').addEventListener('click', function () { go(i - 1); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') go(i + 1);
+    if (e.key === 'ArrowLeft' || e.key === 'PageUp') go(i - 1);
+    if (e.key === 'Home') go(0);
+    if (e.key === 'End') go(slides.length - 1);
+  });
+
+  /* dokunmatik kaydırma — yalnız yatay-baskın hareket slayt değiştirir,
+     dikey scroll navigasyonu tetiklemez */
+  var sx = null, sy = null;
+  document.addEventListener('touchstart', function (e) {
+    sx = e.touches[0].clientX;
+    sy = e.touches[0].clientY;
+  }, { passive: true });
+  document.addEventListener('touchend', function (e) {
+    if (sx === null) return;
+    var dx = e.changedTouches[0].clientX - sx;
+    var dy = e.changedTouches[0].clientY - sy;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+      if (dx < 0) go(i + 1); else go(i - 1);
+    }
+    sx = sy = null;
+  }, { passive: true });
+
+  /* dil (yalnız bellekte tutulur) */
+  var langBtn = document.getElementById('langBtn');
+  function setLang(l) {
+    document.body.classList.toggle('lang-tr', l === 'tr');
+    document.body.classList.toggle('lang-en', l === 'en');
+    document.documentElement.setAttribute('lang', l);
+    langBtn.textContent = l === 'tr' ? 'EN' : 'TR';
+  }
+  langBtn.addEventListener('click', function () {
+    setLang(document.body.classList.contains('lang-tr') ? 'en' : 'tr');
+  });
+
+  /* derin bağlantı: #3 → 3. slayt, ?lang=en → İngilizce başlar */
+  var h = parseInt((location.hash || '').replace('#', ''), 10);
+  if (h >= 1 && h <= slides.length) go(h - 1);
+  if (/[?&]lang=en/.test(location.search)) setLang('en');
+})();
+
+/* ============================================================
+   Composing orb — thinking-orbs'tan birebir port
+   https://github.com/Jakubantalik/thinking-orbs (MIT, © 2026 Jakub Antalik)
+   drawRibbon + core primitifleri; renk, markanın fildişi tonuna eşlendi.
+   ============================================================ */
+(function () {
+  var cv = document.getElementById('orb');
+  if (!cv) return;
+  var ctx = cv.getContext('2d');
+  if (!ctx) { cv.style.display = 'none'; return; }
+  var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var TAU = Math.PI * 2;
+
+  /* core.ts: fibDir — fibonacci küresi yönleri */
+  function fibDir(i, n) {
+    var golden = Math.PI * (3 - Math.sqrt(5));
+    var y = 1 - (2 * (i + 0.5)) / n;
+    var rad = Math.sqrt(Math.max(0, 1 - y * y));
+    var a = i * golden;
+    return [rad * Math.cos(a), y, rad * Math.sin(a)];
+  }
+
+  /* core.ts: makeProj — dönüş + eğim + ortografik projeksiyon */
+  function makeProj(yaw, tilt, cx, cy, scale) {
+    var st = Math.sin(tilt), ct = Math.cos(tilt);
+    var sy = Math.sin(yaw), cyw = Math.cos(yaw);
+    return function (x, y, z) {
+      var x1 = x * cyw + z * sy;
+      var z1 = -x * sy + z * cyw;
+      var y1 = y * ct - z1 * st;
+      var z2 = y * st + z1 * ct;
+      return [cx + x1 * scale, cy - y1 * scale, z2];
+    };
+  }
+
+  /* core.ts: radiusScale — 300pt kare için ayarlı yarıçaplar */
+  function radiusScale(size, pow) { return Math.pow(size / 300, pow); }
+
+  /* core.ts: paint — uzak→yakın z-sıralı mat noktalar.
+     Koyu zeminde mürekkep değeri aynalanır (1-white); gri yerine
+     markanın fildişi tonuna (#e6e2d4) eşlenir. */
+  function paint(dots, rMin) {
+    rMin = rMin == null ? 0.3 : rMin;
+    dots.sort(function (a, b) { return a.z - b.z; });
+    for (var i = 0; i < dots.length; i++) {
+      var d = dots[i];
+      var alpha = d.a == null ? 1 : d.a;
+      if (alpha < 0.02) continue;
+      var w = Math.min(1, Math.max(0, d.white));
+      var v = 1 - w; /* dark tema aynası */
+      ctx.fillStyle = 'rgba(' + Math.round(230 * v) + ',' + Math.round(226 * v) + ',' + Math.round(212 * v) + ',' + alpha + ')';
+      ctx.beginPath();
+      ctx.arc(d.x, d.y, Math.max(rMin, d.r), 0, TAU);
+      ctx.fill();
+    }
+  }
+
+  /* ribbon.ts: drawRibbon — "composing" durumu.
+     Preset (spin: 0): 3B yalpalama donuk, yalnız dalgalanma akar. */
+  var o = { spin: 0, wobMul: 1, lanes: 5, segs: 88, ghostN: 150, rBase: 1.1, rDepth: 1.7, rsPow: 0.6 };
+  var SPEED = 1.55; /* 64px preset 2.34; büyük kadran için yavaşlatıldı */
+
+  function drawRibbon(size, t) {
+    var cx = size / 2, cy = size / 2;
+    var R = (size / 2) * 0.78;
+    var spin = o.spin;
+    var pt = makeProj(t * 0.1 * spin, 0.3, cx, cy, 1);
+    var rs = radiusScale(size, o.rsPow);
+    var dots = [];
+
+    var ghostN = o.ghostN;
+    for (var i = 0; i < ghostN; i++) {
+      var dir = fibDir(i, ghostN);
+      var g = pt(dir[0] * R, dir[1] * R, dir[2] * R);
+      var gd = (g[2] / R + 1) / 2;
+      dots.push({ x: g[0], y: g[1], z: g[2], r: 0.8 * rs, white: 0.78, a: 0.1 + 0.22 * gd });
+    }
+
+    /* kuşak düzlemi (spin=0 iken donuk) */
+    var ya = t * 0.24 * spin;
+    var ta = 0.55 + 0.3 * Math.sin(t * 0.18) * spin;
+    var ux = Math.cos(ya), uy = 0, uz = Math.sin(ya);
+    var vx = -uz * Math.sin(ta), vy = Math.cos(ta), vz = ux * Math.sin(ta);
+    var nx = uy * vz - uz * vy;
+    var ny = uz * vx - ux * vz;
+    var nz = ux * vy - uy * vx;
+
+    var lanes = o.lanes, segs = o.segs;
+    for (var w = 0; w < lanes; w++) {
+      var laneOff = (w - (lanes - 1) / 2) * 0.075;
+      var edge = Math.abs(w - (lanes - 1) / 2) / Math.max(1, (lanes - 1) / 2);
+      for (var k = 0; k < segs; k++) {
+        var a = (k / segs) * TAU;
+        var wob = (0.16 * Math.sin(a * 3 - t * 1.7 + w * 0.22) + 0.07 * Math.sin(a * 5 + t * 1.1)) * o.wobMul;
+        var off = laneOff + wob;
+        var x = ux * Math.cos(a) + vx * Math.sin(a) + nx * off;
+        var y = uy * Math.cos(a) + vy * Math.sin(a) + ny * off;
+        var z = uz * Math.cos(a) + vz * Math.sin(a) + nz * off;
+        var l = Math.sqrt(x * x + y * y + z * z);
+        var p = pt((x / l) * R, (y / l) * R, (z / l) * R);
+        var depth = (p[2] / R + 1) / 2;
+        dots.push({
+          x: p[0], y: p[1], z: p[2],
+          r: (o.rBase + o.rDepth * depth) * (1 - 0.25 * edge) * rs,
+          white: 0.52 - 0.44 * depth + 0.18 * edge,
+          a: 0.4 + 0.6 * depth
+        });
+      }
+    }
+    paint(dots, o.rMin);
+  }
+
+  var DPR = Math.min(devicePixelRatio || 1, 2), W = 0;
+  function size() {
+    var s = cv.getBoundingClientRect().width || 320;
+    W = s;
+    cv.width = cv.height = Math.round(s * DPR);
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    if (reduced) { ctx.clearRect(0, 0, W, W); drawRibbon(W, 1.3); }
+  }
+  size();
+  addEventListener('resize', size);
+
+  if (!reduced) {
+    var host = cv.closest('.slide');
+    var t0 = performance.now();
+    (function loop(now) {
+      /* kapak görünmüyorken çizme; boşa GPU harcanmasın */
+      if (host && !host.classList.contains('active')) {
+        setTimeout(function () { requestAnimationFrame(loop); }, 250);
+        return;
+      }
+      ctx.clearRect(0, 0, W, W);
+      drawRibbon(W, (now - t0) / 1000 * SPEED);
+      requestAnimationFrame(loop);
+    })(t0);
+  }
+})();
+</script>
+
+<!-- metal-fx: gerçek liquid-metal border komponenti (MIT, © Jakub Antalik).
+     React adacığı olarak yalnız CTA'yı sarar; yüklenemezse sade buton kalır. -->
+<script type="module">
+try {
+  const [R, RD, MFX] = await Promise.all([
+    import('https://esm.sh/react@18.3.1'),
+    import('https://esm.sh/react-dom@18.3.1/client'),
+    import('https://esm.sh/metal-fx@1.0.4?deps=react@18.3.1,react-dom@18.3.1'),
+  ]);
+  const h = R.createElement;
+
+  /* iç sheen'i simsiyah maskele: maske içerik katmanının (z5) altında,
+     canvas'ın (z0-3) üstünde; halka dış 2px'te, etkilenmez */
+  function blackout(root, hostSel) {
+    requestAnimationFrame(function () { requestAnimationFrame(function () {
+      var wrap = root.firstElementChild;
+      if (!wrap) return;
+      var mask = document.createElement('div');
+      mask.style.cssText = 'position:absolute;inset:2px;background:#000;z-index:4;pointer-events:none;';
+      wrap.appendChild(mask);
+      var el = wrap.querySelector(hostSel);
+      if (el) { el.style.background = 'transparent'; }
+    }); });
+  }
+
+  /* ana CTA */
+  const root = document.getElementById('mfxRoot');
+  if (root) {
+    RD.createRoot(root).render(
+      h(MFX.MetalFx, { variant: 'button', preset: 'silver', theme: 'dark' },
+        h('a', { className: 'mfx-host', href: 'mailto:hello@cogitave.com?subject=Tan%C4%B1%C5%9Fma%20talebi%20(namzu%20sunumu)' },
+          h('span', { className: 'tr' }, 'Tanışalım'),
+          h('span', { className: 'en' }, "Let's talk")))
+    );
+    blackout(root, '.mfx-host');
+  }
+
+  /* dil düğmesi: orijinal #langBtn gizlenir, metal sarmalı kopya ona delege eder */
+  const langRoot = document.getElementById('mfxLang');
+  const orig = document.getElementById('langBtn');
+  if (langRoot && orig) {
+    RD.createRoot(langRoot).render(
+      h(MFX.MetalFx, { variant: 'button', preset: 'silver', theme: 'dark' },
+        h('button', {
+          className: 'mfx-lang mono',
+          'aria-label': 'Language',
+          onClick: function () { orig.click(); },
+        }, orig.textContent))
+    );
+    orig.style.display = 'none';
+    blackout(langRoot, '.mfx-lang');
+    /* deck kodu orig.textContent'i değiştirdikçe metal kopyaya yansıt */
+    new MutationObserver(function () {
+      var b = langRoot.querySelector('.mfx-lang');
+      if (b && b.textContent !== orig.textContent) b.textContent = orig.textContent;
+    }).observe(orig, { childList: true, characterData: true, subtree: true });
+  }
+} catch (e) { console.warn('metal-fx yüklenemedi:', e); /* yedek butonlar görünür kalır */ }
+</script>
+</body>
+</html>

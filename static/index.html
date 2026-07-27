@@ -1,0 +1,527 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cogitave | Ajanlar İçin Yapay Zekâ</title>
+    <meta name="description" content="Cogitave, İstanbul merkezli yapay zekâ stüdyosu. Ajan işletim sistemi Yuva, açık kaynak çekirdek Namzu ve orchestrator ajan Cogi. Üretken YZ geliştirme, GPU model barındırma, endüstriyel IoT ve güvenlik çözümleri." />
+    <meta name="theme-color" content="#0a0a0f" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://cogitave.com/" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Cogitave" />
+    <meta property="og:title" content="Cogitave | Ajanlar İçin Yapay Zekâ" />
+    <meta property="og:description" content="Ajan işletim sistemi Yuva, açık kaynak çekirdek Namzu ve orchestrator ajan Cogi. Yapay zekâyı üretim hattına dönüştürüyoruz." />
+    <meta property="og:url" content="https://cogitave.com/" />
+    <meta property="og:image" content="https://cogitave.com/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="tr_TR" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Cogitave | Ajanlar İçin Yapay Zekâ" />
+    <meta name="twitter:description" content="Ajan işletim sistemi Yuva, açık kaynak çekirdek Namzu ve orchestrator ajan Cogi. Yapay zekâyı üretim hattına dönüştürüyoruz." />
+    <meta name="twitter:image" content="https://cogitave.com/og.png" />
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Cogitave",
+      "legalName": "Cogitave Yazılım ve Danışmanlık Ltd. Şti.",
+      "url": "https://cogitave.com",
+      "logo": "https://cogitave.com/favicon.svg",
+      "email": "hello@cogitave.com",
+      "address": { "@type": "PostalAddress", "addressLocality": "İstanbul", "addressCountry": "TR" },
+      "sameAs": ["https://github.com/cogitave"],
+      "knowsAbout": ["Yapay Zekâ", "Otonom Ajanlar", "Model Barındırma", "Endüstriyel IoT", "MLOps", "Güvenlik"]
+    }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=Space+Grotesk:wght@700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <script type="module" crossorigin src="/assets/index-CPKX8A3v.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-3Zjkavxa.css">
+  </head>
+  <body>
+    <canvas id="gl" aria-hidden="true"></canvas>
+    <div class="grain" aria-hidden="true"></div>
+
+    <div class="frame">
+      <header class="topbar">
+        <a class="logo" href="/" aria-label="Cogitave ana sayfa">cogitave</a>
+
+        <nav class="topnav" aria-label="Ana menü">
+          <button class="topnav-item" id="researchTrigger">Araştırma</button>
+          <button class="topnav-item" id="productsTrigger">Çözümlerimiz</button>
+          <a class="topnav-item" href="mailto:hello@cogitave.com">İletişim</a>
+        </nav>
+
+        <a class="btn btn-solid" href="mailto:hello@cogitave.com">Tanışalım</a>
+
+        <button class="nav-burger" id="navBurger" aria-expanded="false" aria-controls="mobileMenu" aria-label="Menü">
+          <span></span><span></span>
+        </button>
+      </header>
+
+      <div class="mobile-menu glass" id="mobileMenu" aria-hidden="true">
+        <button class="mm-item" id="mmResearch">Araştırma</button>
+        <button class="mm-item" id="mmProducts">Çözümlerimiz</button>
+        <a class="mm-item" href="mailto:hello@cogitave.com">İletişim</a>
+      </div>
+
+      <main class="stage">
+        <span class="cross cross-tl" aria-hidden="true"></span>
+        <span class="cross cross-tr" aria-hidden="true"></span>
+        <span class="cross cross-bl" aria-hidden="true"></span>
+        <span class="cross cross-br" aria-hidden="true"></span>
+
+        <div class="stage-left">
+          <h1 class="typeline mono" id="headline" aria-label="Cogitave — yapay zekâ araştırma stüdyosu">
+            <span class="type-prompt" aria-hidden="true">&gt;&nbsp;</span><span id="typeText"></span><span class="type-cursor" aria-hidden="true"></span>
+          </h1>
+        </div>
+
+        <aside class="stage-right" aria-label="Hizmetler">
+          <div class="idx-head mono" data-reveal>HİZMETLER</div>
+          <div class="drillnav" id="drillnav" data-reveal>
+
+            <div class="dv dv-active" data-view="root">
+              <button class="dv-row" data-goto="genai">
+                <span class="mono dv-no">01</span><span class="dv-title">Üretken YZ Geliştirme</span>
+                <svg class="dv-chev" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M4.5 2.5L8 6l-3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <button class="dv-row" data-goto="agents">
+                <span class="mono dv-no">02</span><span class="dv-title">Otonom Ajan Sistemleri</span>
+                <svg class="dv-chev" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M4.5 2.5L8 6l-3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <button class="dv-row" data-goto="hosting">
+                <span class="mono dv-no">03</span><span class="dv-title">Model Barındırma<em class="idx-tag mono">YENİ</em></span>
+                <svg class="dv-chev" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M4.5 2.5L8 6l-3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <button class="dv-row" data-goto="iot">
+                <span class="mono dv-no">04</span><span class="dv-title">Endüstriyel IoT &amp; Edge</span>
+                <svg class="dv-chev" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M4.5 2.5L8 6l-3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <button class="dv-row" data-goto="infra">
+                <span class="mono dv-no">05</span><span class="dv-title">Veri &amp; Altyapı Mühendisliği</span>
+                <svg class="dv-chev" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M4.5 2.5L8 6l-3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <button class="dv-row" data-goto="security">
+                <span class="mono dv-no">06</span><span class="dv-title">Güvenlik &amp; Uyumluluk</span>
+                <svg class="dv-chev" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M4.5 2.5L8 6l-3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <button class="dv-row" data-goto="consulting">
+                <span class="mono dv-no">07</span><span class="dv-title">Danışmanlık &amp; Eğitim</span>
+                <svg class="dv-chev" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M4.5 2.5L8 6l-3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+            </div>
+
+            <div class="dv" data-view="genai">
+              <button class="dv-back mono" data-goto="root">&larr; GERİ</button>
+              <div class="dv-heading">Üretken YZ Geliştirme</div>
+              <button class="dv-item" data-open-payment data-plan="genai-discovery">
+                <span class="dv-item-main"><b>Keşif Sprint'i</b><small>2 hafta · senaryolar, fizibilite, mimari</small></span>
+                <span class="mono dv-price">$4,900</span>
+              </button>
+              <button class="dv-item" data-open-payment data-plan="genai-pilot">
+                <span class="dv-item-main"><b>Pilot Ürün</b><small>6 hafta · üretime hazır MVP + RAG</small></span>
+                <span class="mono dv-price">$19,500</span>
+              </button>
+              <a class="dv-item" href="mailto:hello@cogitave.com?subject=%C3%9Cretken%20YZ%20%E2%80%94%20%C3%96l%C3%A7ekleme">
+                <span class="dv-item-main"><b>Ölçekleme Programı</b><small>Kurumsal yaygınlaştırma · sürekli ekip</small></span>
+                <span class="mono dv-price">TEKLİF</span>
+              </a>
+            </div>
+
+            <div class="dv" data-view="agents">
+              <button class="dv-back mono" data-goto="root">&larr; GERİ</button>
+              <div class="dv-heading">Otonom Ajan Sistemleri</div>
+              <button class="dv-item" data-open-payment data-plan="agents-poc">
+                <span class="dv-item-main"><b>Ajan PoC</b><small>4 hafta · tek akış, go/no-go kararı</small></span>
+                <span class="mono dv-price">$12,500</span>
+              </button>
+              <button class="dv-item" data-open-payment data-plan="agents-prod">
+                <span class="dv-item-main"><b>Üretim Ajanı</b><small>SLA'lı dağıtım · izleme · onay kapıları</small></span>
+                <span class="mono dv-price">$34,000</span>
+              </button>
+              <a class="dv-item" href="mailto:hello@cogitave.com?subject=Ajan%20Platformu">
+                <span class="dv-item-main"><b>Ajan Platformu</b><small>Çoklu ajan orkestrasyonu · Yuva tabanlı</small></span>
+                <span class="mono dv-price">TEKLİF</span>
+              </a>
+            </div>
+
+            <div class="dv" data-view="hosting">
+              <button class="dv-back mono" data-goto="root">&larr; GERİ</button>
+              <div class="dv-heading">Model Barındırma</div>
+              <button class="dv-item" data-open-payment data-plan="hosting-starter">
+                <span class="dv-item-main"><b>Starter</b><small>Paylaşımlı GPU · scale-to-zero API</small></span>
+                <span class="mono dv-price">$149/AY</span>
+              </button>
+              <button class="dv-item" data-open-payment data-plan="hosting-pro">
+                <span class="dv-item-main"><b>Pro</b><small>Özel GPU (L4/A10G) · otomatik ölçekleme</small></span>
+                <span class="mono dv-price">$690/AY</span>
+              </button>
+              <a class="dv-item" href="mailto:hello@cogitave.com?subject=Enterprise%20Bar%C4%B1nd%C4%B1rma">
+                <span class="dv-item-main"><b>Enterprise</b><small>Özel küme · %99,9 SLA · VPC / yerinde</small></span>
+                <span class="mono dv-price">TEKLİF</span>
+              </a>
+            </div>
+
+            <div class="dv" data-view="iot">
+              <button class="dv-back mono" data-goto="root">&larr; GERİ</button>
+              <div class="dv-heading">Endüstriyel IoT &amp; Edge</div>
+              <button class="dv-item" data-open-payment data-plan="iot-survey">
+                <span class="dv-item-main"><b>Saha Keşfi</b><small>OT/IT değerlendirme · pilot planı</small></span>
+                <span class="mono dv-price">$6,500</span>
+              </button>
+              <button class="dv-item" data-open-payment data-plan="iot-pilot">
+                <span class="dv-item-main"><b>Pilot Hat</b><small>Edge-otonom kurulum · tek tesis · telemetri</small></span>
+                <span class="mono dv-price">$28,000</span>
+              </button>
+              <a class="dv-item" href="mailto:hello@cogitave.com?subject=End%C3%BCstriyel%20IoT%20%E2%80%94%20Filo">
+                <span class="dv-item-main"><b>Filo Ölçeği</b><small>Çok tesis dağıtım · SLA · uyum raporlama</small></span>
+                <span class="mono dv-price">TEKLİF</span>
+              </a>
+            </div>
+
+            <div class="dv" data-view="infra">
+              <button class="dv-back mono" data-goto="root">&larr; GERİ</button>
+              <div class="dv-heading">Veri &amp; Altyapı Mühendisliği</div>
+              <button class="dv-item" data-open-payment data-plan="infra-audit">
+                <span class="dv-item-main"><b>Mimari Denetim</b><small>Altyapı + maliyet incelemesi · rapor</small></span>
+                <span class="mono dv-price">$3,900</span>
+              </button>
+              <button class="dv-item" data-open-payment data-plan="infra-sprint">
+                <span class="dv-item-main"><b>Platform Sprint'i</b><small>Multi-cloud IaC · veri hattı · vektör altyapısı</small></span>
+                <span class="mono dv-price">$14,500</span>
+              </button>
+              <button class="dv-item" data-open-payment data-plan="infra-retainer">
+                <span class="dv-item-main"><b>Sürekli Mühendislik</b><small>Aylık kapasite · MLOps · nöbetçi destek</small></span>
+                <span class="mono dv-price">$5,500/AY</span>
+              </button>
+            </div>
+
+            <div class="dv" data-view="security">
+              <button class="dv-back mono" data-goto="root">&larr; GERİ</button>
+              <div class="dv-heading">Güvenlik &amp; Uyumluluk</div>
+              <button class="dv-item" data-open-payment data-plan="security-assess">
+                <span class="dv-item-main"><b>Güvenlik Değerlendirmesi</b><small>Zero-trust boşluk analizi · bulgu raporu</small></span>
+                <span class="mono dv-price">$7,500</span>
+              </button>
+              <button class="dv-item" data-open-payment data-plan="security-program">
+                <span class="dv-item-main"><b>Uyum Programı</b><small>Controls-as-code (OSCAL/OPA) · denetim kanıtları</small></span>
+                <span class="mono dv-price">$21,000</span>
+              </button>
+              <a class="dv-item" href="mailto:hello@cogitave.com?subject=S%C3%BCrekli%20%C4%B0zleme">
+                <span class="dv-item-main"><b>Sürekli İzleme</b><small>Yönetilen güvenlik · 7/24 tehdit takibi</small></span>
+                <span class="mono dv-price">TEKLİF</span>
+              </a>
+            </div>
+
+            <div class="dv" data-view="consulting">
+              <button class="dv-back mono" data-goto="root">&larr; GERİ</button>
+              <div class="dv-heading">Danışmanlık &amp; Eğitim</div>
+              <button class="dv-item" data-open-payment data-plan="consulting-session">
+                <span class="dv-item-main"><b>Strateji Oturumu</b><small>Yarım gün · yönetici seviyesi · fırsat haritası</small></span>
+                <span class="mono dv-price">$1,200</span>
+              </button>
+              <button class="dv-item" data-open-payment data-plan="consulting-roadmap">
+                <span class="dv-item-main"><b>Teknik Yol Haritası</b><small>2 hafta · mimari kararlar · bütçe planı</small></span>
+                <span class="mono dv-price">$6,800</span>
+              </button>
+              <button class="dv-item" data-open-payment data-plan="consulting-training">
+                <span class="dv-item-main"><b>Ekip Atölyesi</b><small>2 gün · uygulamalı · kendi ürününüzle</small></span>
+                <span class="mono dv-price">$4,500</span>
+              </button>
+            </div>
+
+          </div>
+
+          <button class="paydock glass" id="payDock" data-open-payment data-plan="custom" data-reveal>
+            <span class="paydock-body">
+              <span class="mono paydock-label">ZATEN MÜŞTERİMİZ MİSİNİZ?</span>
+              <span class="paydock-title">Ödemenizi buradan yapın</span>
+            </span>
+            <svg class="paydock-arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h9m0 0L8.5 4.5M12 8l-3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </aside>
+      </main>
+
+      <footer class="bottombar">
+        <div class="partner-logos" aria-label="Teknoloji iş ortakları">
+          <img class="partner-img" src="/logos/aws.svg" alt="Amazon Web Services" loading="lazy" />
+          <span class="pdiv" aria-hidden="true"></span>
+          <img class="partner-img" src="/logos/azure.svg" alt="Microsoft Azure" loading="lazy" />
+          <span class="pdiv" aria-hidden="true"></span>
+          <span class="partner-text">SAP</span>
+          <span class="pdiv" aria-hidden="true"></span>
+          <img class="partner-img" src="/logos/oracle.svg" alt="Oracle" loading="lazy" />
+        </div>
+        <span class="mono bb-copy">© 2026 COGITAVE YAZILIM VE DANIŞMANLIK LTD. ŞTİ.</span>
+        <div class="pay-logos" aria-label="Desteklenen ödeme yöntemleri">
+          <span class="pay-secure mono">
+            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1.5l5 2v4c0 3.2-2.1 5.6-5 7-2.9-1.4-5-3.8-5-7v-4l5-2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M5.8 8l1.6 1.6 2.8-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            GÜVENLİ ÖDEME
+          </span>
+          <span class="pay-chip chip-iyzico">iyzico</span>
+          <span class="pay-chip chip-mc" aria-label="Mastercard">
+            <svg viewBox="0 0 36 22" aria-hidden="true"><circle cx="14" cy="11" r="7.5" fill="#EB001B"/><circle cx="22" cy="11" r="7.5" fill="#F79E1B"/><path d="M18 5.2a7.5 7.5 0 0 1 0 11.6 7.5 7.5 0 0 1 0-11.6z" fill="#FF5F00"/></svg>
+          </span>
+          <span class="pay-chip chip-visa">VISA</span>
+          <span class="pay-chip chip-troy">troy</span>
+          <span class="pay-chip chip-amex">AMEX</span>
+        </div>
+      </footer>
+    </div>
+
+    <!-- Araştırma — blog tarzı yazılar -->
+    <div class="prod-root" id="researchOverlay" aria-hidden="true">
+      <div class="prod res glass">
+        <header class="prod-top">
+          <span class="mono">ARAŞTIRMA · COGITAVE</span>
+          <button class="modal-close" data-close-research aria-label="Kapat">
+            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 4l8 8m0-8l-8 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          </button>
+        </header>
+
+        <div class="res-list">
+          <article class="res-row">
+            <span class="mono res-date">2026.07</span>
+            <div class="res-body">
+              <h3 class="res-title">Kendi LoRA'sını eğiten ajan: Cogi'nin otonom öğrenme döngüsü</h3>
+              <p class="res-excerpt mono">Kullanım verisinden sürekli öğrenen bir orchestrator: LoRA damıtma hattı, değerlendirme kapıları ve güvenli dağıtım stratejisi.</p>
+            </div>
+            <span class="mono res-tag">AJANLAR</span>
+          </article>
+
+          <article class="res-row">
+            <span class="mono res-date">2026.06</span>
+            <div class="res-body">
+              <h3 class="res-title">Yuva'da soğuk başlatma: mikro-VM'lerden 34 kata kadar hızlı</h3>
+              <p class="res-excerpt mono">Ajan işletim sisteminde milisaniyelik başlatma için izlediğimiz yol: bellek anlık görüntüleri, tembel sayfalama ve ölçüm metodolojisi.</p>
+            </div>
+            <span class="mono res-tag">SİSTEMLER</span>
+          </article>
+
+          <article class="res-row">
+            <span class="mono res-date">2026.05</span>
+            <div class="res-body">
+              <h3 class="res-title">Agent kernel neden bağımlılıksız olmalı?</h3>
+              <p class="res-excerpt mono">Namzu'nun tasarım ilkeleri: çekirdek sizde, arayüz sizin, kontrol sizde. Kurumsalda vendor lock-in olmadan ajan altyapısı.</p>
+            </div>
+            <span class="mono res-tag">MİMARİ</span>
+          </article>
+
+          <article class="res-row">
+            <span class="mono res-date">2026.04</span>
+            <div class="res-body">
+              <h3 class="res-title">Edge-otonom filolarda telemetri ve veri bütünlüğü</h3>
+              <p class="res-excerpt mono">Bağlantı koptuğunda da çalışan saha cihazları: yerel karar, kuyruklu senkron ve endüstriyel ortamda izlenebilirlik desenleri.</p>
+            </div>
+            <span class="mono res-tag">ENDÜSTRİYEL</span>
+          </article>
+        </div>
+
+        <footer class="prod-labs">
+          <span class="mono prod-labs-label">TÜM YAZILAR YAKINDA — learn.cogitave.com</span>
+        </footer>
+      </div>
+    </div>
+
+    <!-- Ürünler — detay sayfası -->
+    <div class="prod-root" id="productOverlay" aria-hidden="true">
+      <div class="prod glass">
+        <header class="prod-top">
+          <span class="mono">ÇÖZÜMLERİMİZ · COGITAVE</span>
+          <button class="modal-close" data-close-products aria-label="Kapat">
+            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 4l8 8m0-8l-8 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          </button>
+        </header>
+
+        <div class="prod-grid">
+          <article class="prod-card">
+            <span class="mono prod-no">01 / AJAN İŞLETİM SİSTEMİ</span>
+            <h3 class="prod-name">yuva</h3>
+            <p class="prod-slogan">"İnsanlar için değil, yalnızca ajanlar için."</p>
+            <p class="prod-desc">
+              Ajanların planlandığı, yetkilendirildiği ve gözlemlendiği işletim
+              katmanı. Kaynak, kimlik ve yetki tek sistemde.
+            </p>
+            <div class="prod-stat">
+              <b>34×</b>
+              <span class="mono">FIRECRACKER'A GÖRE DAHA HIZLI BAŞLATMA</span>
+            </div>
+            <ul class="prod-list mono">
+              <li>Ajan yaşam döngüsü &amp; zamanlama</li>
+              <li>Kimlik ve yetki modeli</li>
+              <li>Uçtan uca gözlemlenebilirlik</li>
+              <li>Çıplak donanım veya KVM konuğu olarak çalışır</li>
+            </ul>
+            <div class="prod-foot">
+              <span class="prod-tag mono">AÇIK KAYNAK</span>
+            </div>
+          </article>
+
+          <article class="prod-card">
+            <span class="mono prod-no">02 / AJAN ÇEKİRDEĞİ</span>
+            <h3 class="prod-name">namzu</h3>
+            <p class="prod-slogan">"Her ajanın altında aynı çekirdek."</p>
+            <p class="prod-desc">
+              Açık kaynak agent kernel. Tam kontrol sizde: dış bağımlılık
+              olmadan kurumsala kurulur, uyarlanır, özelleştirilir. Üzerine
+              arayüzünüzü koyun, çalışsın.
+            </p>
+            <div class="prod-stat">
+              <b>0</b>
+              <span class="mono">DIŞ BAĞIMLILIK · ÇEKİRDEK TAMAMEN SİZİN</span>
+            </div>
+            <ul class="prod-list mono">
+              <li>Tam kontrol, çekirdek seviyesinde</li>
+              <li>Kurumsala uyarlanabilir, özelleştirilebilir</li>
+              <li>Her arayüzün altına takılır, sistem hazır</li>
+            </ul>
+            <div class="prod-foot">
+              <span class="prod-tag mono">AÇIK KAYNAK</span>
+            </div>
+          </article>
+
+          <article class="prod-card">
+            <span class="mono prod-no">03 / ORCHESTRATOR AJAN</span>
+            <h3 class="prod-name">cogi</h3>
+            <p class="prod-slogan">"Şirketinizi tanıyan ajan."</p>
+            <p class="prod-desc">
+              Tam otonom orchestrator ajan: şirketinizi tanır, kullanımınızdan
+              öğrenir, kendi LoRA'sını eğitir ve kendi modelini çıkarır.
+            </p>
+            <div class="prod-stat">
+              <b>∞</b>
+              <span class="mono">KULLANDIKÇA KENDİ MODELİNİ EĞİTİR</span>
+            </div>
+            <ul class="prod-list mono">
+              <li>Tam otonom orkestrasyon</li>
+              <li>Kullanıma bağlı kendi LoRA'sını çıkarır</li>
+              <li>Kendi modelini damıtır ve dağıtır</li>
+            </ul>
+            <div class="prod-foot">
+              <span class="prod-tag mono">YAKINDA</span>
+            </div>
+          </article>
+        </div>
+
+        <footer class="prod-labs">
+          <span class="mono prod-labs-label">ORGANİZASYON</span>
+          <span class="prod-lab">
+            <b>cogitave</b><small>Çekirdek ürünler: yuva, namzu, cogi</small>
+          </span>
+          <span class="prod-lab">
+            <b>cogitave-ai</b><small>Model portları · ajan &amp; eklenti kayıt sistemi</small>
+          </span>
+          <span class="prod-lab">
+            <b>cogitave-cloud</b><small>Barındırılan servisler · API gateway</small>
+          </span>
+          <span class="prod-lab">
+            <b>cogitave-labs</b><small>Ar-Ge: editör ve tarayıcı prototipleri</small>
+          </span>
+          <span class="prod-lab">
+            <b>cogitave-services</b><small>Sektörel çözümler: endüstriyel IoT</small>
+          </span>
+        </footer>
+      </div>
+    </div>
+
+    <!--
+      Ödeme ekranı — iyzico Checkout Form entegrasyon noktası.
+      Prod'da: backend, iyzico CheckoutFormInitialize çağrısı yapar ve dönen
+      checkoutFormContent script'i #iyzipay-checkout-form içine mount edilir.
+      Aşağıdaki form tasarım/önizleme amaçlıdır.
+    -->
+    <div class="modal-root" id="paymentModal" aria-hidden="true">
+      <div class="modal-backdrop" data-close-payment></div>
+      <div class="modal glass" role="dialog" aria-modal="true" aria-labelledby="payTitle">
+        <button class="modal-close" data-close-payment aria-label="Kapat">
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 4l8 8m0-8l-8 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </button>
+
+        <div class="pay-left">
+          <div class="cc" id="creditCard">
+            <div class="cc-inner">
+              <div class="cc-face cc-front">
+                <div class="cc-top">
+                  <svg class="cc-chip-svg" viewBox="0 0 34 24" aria-hidden="true"><rect x="1" y="1" width="32" height="22" rx="4" fill="url(#chipg)"/><path d="M1 9h10M1 15h10M23 9h10M23 15h10M17 1v22M11 9a6 6 0 0 1 12 0M11 15a6 6 0 0 0 12 0" stroke="rgba(60,45,10,.45)" fill="none"/><defs><linearGradient id="chipg" x1="0" y1="0" x2="34" y2="24"><stop stop-color="#f2d98c"/><stop offset="1" stop-color="#c9a24b"/></linearGradient></defs></svg>
+                  <span class="cc-brand">cogitave</span>
+                </div>
+                <div class="cc-number" id="ccNumber">•••• •••• •••• ••••</div>
+                <div class="cc-bottom">
+                  <div><span class="cc-label mono">KART SAHİBİ</span><span id="ccName">AD SOYAD</span></div>
+                  <div><span class="cc-label mono">SKT</span><span id="ccExpiry">••/••</span></div>
+                </div>
+              </div>
+              <div class="cc-face cc-back">
+                <div class="cc-stripe"></div>
+                <div class="cc-cvv-row"><span class="cc-label mono">CVV</span><span class="cc-cvv" id="ccCvv">•••</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="pay-order">
+            <div class="pay-item"><span id="orderName">Model Barındırma — Starter (aylık)</span><span id="orderPrice">$149</span></div>
+            <div class="pay-item muted"><span>KDV (%20)</span><span id="orderVat">$30</span></div>
+            <div class="pay-item total"><span>Toplam</span><span id="orderTotal">$179</span></div>
+          </div>
+        </div>
+
+        <div class="pay-right">
+          <div class="pay-head">
+            <h2 id="payTitle">Güvenli Ödeme</h2>
+            <p class="mono">256-BIT SSL · İYZİCO GÜVENCESİYLE</p>
+          </div>
+
+          <form class="pay-form" id="iyzipay-checkout-form" novalidate>
+            <label class="field" id="amountField" hidden>
+              <span class="mono">TUTAR (USD)</span>
+              <input type="text" id="inpAmount" inputmode="numeric" placeholder="0" maxlength="9" autocomplete="off" />
+            </label>
+            <label class="field">
+              <span class="mono">KART ÜZERİNDEKİ İSİM</span>
+              <input type="text" id="inpName" autocomplete="cc-name" placeholder="Ad Soyad" spellcheck="false" />
+            </label>
+            <label class="field">
+              <span class="mono">KART NUMARASI</span>
+              <input type="text" id="inpNumber" inputmode="numeric" autocomplete="cc-number" placeholder="0000 0000 0000 0000" maxlength="19" />
+            </label>
+            <div class="field-row">
+              <label class="field">
+                <span class="mono">SON KULLANMA</span>
+                <input type="text" id="inpExpiry" inputmode="numeric" autocomplete="cc-exp" placeholder="AA/YY" maxlength="5" />
+              </label>
+              <label class="field">
+                <span class="mono">CVV</span>
+                <input type="text" id="inpCvv" inputmode="numeric" autocomplete="cc-csc" placeholder="•••" maxlength="4" />
+              </label>
+            </div>
+            <button type="submit" class="btn btn-primary btn-pay">
+              <span class="btn-label" id="payBtnLabel">$179 — iyzico ile Öde</span>
+            </button>
+          </form>
+
+          <div class="pay-logos modal-logos">
+            <span class="pay-chip chip-iyzico">iyzico</span>
+            <span class="pay-chip chip-mc"><svg viewBox="0 0 36 22" aria-hidden="true"><circle cx="14" cy="11" r="7.5" fill="#EB001B"/><circle cx="22" cy="11" r="7.5" fill="#F79E1B"/><path d="M18 5.2a7.5 7.5 0 0 1 0 11.6 7.5 7.5 0 0 1 0-11.6z" fill="#FF5F00"/></svg></span>
+            <span class="pay-chip chip-visa">VISA</span>
+            <span class="pay-chip chip-troy">troy</span>
+            <span class="pay-chip chip-amex">AMEX</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </body>
+</html>
