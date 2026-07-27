@@ -16,5 +16,5 @@
   "i18n": { "locales": ["tr", "en"] },
   "analytics": { "events": ["cta_click", "locale_switch"] },
   "owner": "cogitave/web",
-  "status": "staged"
+  "status": "live"
 }

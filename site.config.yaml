@@ -74,12 +74,18 @@ deploy:
     # Provider-agnostic list; selection is an infra concern (internal/infra). Each
     # consumes the same `build.output` artifact via the portable edge contract.
     - name: primary
-      kind: edge
-      provider: TBD                    # e.g. an OCI/object-store + edge-compute combo; chosen in infra
+      kind: static                     # the build emits a plain static bundle
+      provider: cloudflare-pages       # continuity: cogitave.com already resolves to Cloudflare
+      project: cogitave-web            # Pages project; override with the CLOUDFLARE_PAGES_PROJECT repo variable
       regionByAudience: true
+      note: >-
+        Named because a deploy has to point somewhere, not because we are locked
+        in. The pipeline uploads `build.output.static` as-is, so moving provider
+        is a change to .github/workflows/deploy.yml and nothing else - no build
+        output, config or content changes with it.
     - name: failover
       kind: static
-      provider: TBD
+      provider: TBD                    # unset until there is a second target to fail over to
   immutableReleases: true              # content-addressed; atomic promote + instant rollback
   cdn:
     cacheControl: "public, max-age=0, s-maxage=31536000, stale-while-revalidate=86400"
@@ -99,18 +105,17 @@ apps:
       manifest: apps/corporate-landing/app.manifest.json   # the homepage
       route: "/"
       property: marketing-site
-      status: staged                    # planned | staged | live | archived
-      # staged, not live: three content gates are still open before this ships —
-      # the published prices must project from the corp/gtm pricing registry, the
-      # quantitative product claims must carry their benchmark attribution
-      # (yuva/docs/BENCHMARKS.md), and the partner logo strip needs the alliances
-      # /trademark check. Payment collection is NOT part of this app; see the
-      # payments property below.
+      status: live                      # planned | staged | live | archived
+      # The gates that held this at `staged` are closed: prices project from the
+      # corp/gtm registry, the quantitative claims carry their benchmark
+      # attribution, and the platform strip states a fact rather than a partner
+      # claim. Payment collection is NOT part of this app (ADR-0004), and the
+      # "pay here" link stays withheld until pay.cogitave.com answers.
     - id: namzu-solutions
       manifest: apps/namzu-solutions/app.manifest.json
       route: /namzu
       property: marketing-site
-      status: staged
+      status: live
       # The customer presentation, ported out of a standalone HTML file into the
       # content model. Its old URL redirects here (see `redirects` below).
     # Drop new campaigns/landing pages here, e.g.:

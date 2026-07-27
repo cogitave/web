@@ -259,6 +259,4 @@ blocks:
       # Existing customers used to pay through a card form embedded in this page.
       # Payment now lives on its own surface; the landing only links out. See
       # docs/decisions/0004-payments-off-the-marketing-surface.md.
-      secondary:
-        label: Already a customer? Pay here
-        href: https://pay.cogitave.com/
+      # Withheld until pay.cogitave.com answers — see the Turkish sibling.
