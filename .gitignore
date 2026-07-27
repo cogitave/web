@@ -28,3 +28,6 @@ coverage/
 # (site.config.yaml build.output: static -> _site/, edge -> _edge/)
 _site/
 _edge/
+
+# The verbatim passthrough is real source, not build output - it must ship.
+!static/

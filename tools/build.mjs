@@ -676,6 +676,31 @@ export async function build(argv = []) {
     await cp(path.join(ROOT, 'assets'), path.join(outDir, 'assets'), { recursive: true });
   }
 
+  // Verbatim passthrough, copied LAST so it wins.
+  //
+  // This exists because porting a page into the content model is not the same
+  // as reproducing its design, and the two must not be conflated again. The
+  // homepage and the namzu deck each carry a bespoke design system - a WebGL
+  // background, a drill-down nav, ten hand-built slide layouts - that the
+  // content-model versions do not yet reproduce. Until they do, the original
+  // build is what visitors get.
+  //
+  // Anything in static/ overrides what the build rendered at the same path. A
+  // page leaves static/ only when its ported version genuinely matches, which
+  // is a judgement made by looking at both, not by the build passing.
+  const staticDir = path.join(ROOT, 'static');
+  if (existsSync(staticDir)) {
+    await cp(staticDir, outDir, { recursive: true, force: true });
+    const overridden = [];
+    for (const page of pages) {
+      const candidate = path.join(staticDir, outputPathFor(page.urlPath));
+      if (existsSync(candidate)) overridden.push(page.urlPath);
+    }
+    if (overridden.length) {
+      log(`  static ${overridden.join(', ')} served verbatim from static/ (rendered version withheld)`);
+    }
+  }
+
   // Redirect stubs. A moved URL keeps working: the stub carries a canonical
   // pointing at the destination (so a crawler consolidates rather than indexing
   // the stub), a meta refresh, and a real link for anyone who lands with JS and

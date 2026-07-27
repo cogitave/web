@@ -1,0 +1,41 @@
+# Cogitave
+
+> Cogitave, İstanbul merkezli bir yapay zekâ araştırma stüdyosudur. Temel modeller ve otonom sistemler geliştirir: ajan işletim sistemi Yuva, açık kaynak ajan çekirdeği Namzu ve orchestrator ajan Cogi. Kurumlara üretken yapay zekâ geliştirme, otonom ajan sistemleri, GPU destekli model barındırma, endüstriyel IoT, veri ve altyapı mühendisliği, güvenlik ve danışmanlık hizmetleri sunar.
+
+Şirket unvanı: Cogitave Yazılım ve Danışmanlık Ltd. Şti.
+İletişim: hello@cogitave.com
+
+## Çözümler
+
+- [Yuva](https://cogitave.com/): Ajan işletim sistemi. İnsanlar için değil, yalnızca ajanlar için. Firecracker'a göre 34 kata kadar daha hızlı başlatma; çıplak donanımda veya KVM üzerinde konuk (guest) olarak çalışır. Ajan yaşam döngüsü, zamanlama, kimlik ve yetki modeli, uçtan uca gözlemlenebilirlik. Açık kaynak.
+- [Namzu](https://cogitave.com/): Açık kaynak agent kernel. Tam kontrol, çekirdek seviyesinde: dış bağımlılık olmadan kurumsala kurulur, uyarlanabilir ve özelleştirilebilir. Her arayüzün altına takılır, sistem hazırdır. Taşınabilir ABI, deterministik çalışma zamanı.
+- [Cogi](https://cogitave.com/): Tam otonom orchestrator ajan. Şirketi tanır, kullanımdan öğrenir, kendi LoRA'sını eğitir ve kendi modelini çıkarır. Yakında.
+
+## Araştırma
+
+- Kendi LoRA'sını eğiten ajan: Cogi'nin otonom öğrenme döngüsü (2026-07)
+- Yuva'da soğuk başlatma: mikro-VM'lerden 34 kata kadar hızlı (2026-06)
+- Agent kernel neden bağımlılıksız olmalı? Namzu'nun tasarım ilkeleri (2026-05)
+- Edge-otonom filolarda telemetri ve veri bütünlüğü (2026-04)
+
+## Hizmetler
+
+- Üretken YZ Geliştirme: Keşif Sprint'i ($4,900), Pilot Ürün ($19,500), Ölçekleme Programı (teklif).
+- Otonom Ajan Sistemleri: Ajan PoC ($12,500), Üretim Ajanı ($34,000), Ajan Platformu (teklif).
+- Model Barındırma: Starter $149/ay, Pro $690/ay, Enterprise (teklif). GPU destekli, otomatik ölçekleme, özel uç nokta.
+- Endüstriyel IoT ve Edge: Saha Keşfi ($6,500), Pilot Hat ($28,000), Filo Ölçeği (teklif).
+- Veri ve Altyapı Mühendisliği: Mimari Denetim ($3,900), Platform Sprint'i ($14,500), Sürekli Mühendislik ($5,500/ay).
+- Güvenlik ve Uyumluluk: Güvenlik Değerlendirmesi ($7,500), Uyum Programı ($21,000), Sürekli İzleme (teklif).
+- Danışmanlık ve Eğitim: Strateji Oturumu ($1,200), Teknik Yol Haritası ($6,800), Ekip Atölyesi ($4,500).
+
+## Ödeme
+
+- Ödemeler iyzico altyapısıyla alınır. Visa, Mastercard, Troy ve Amex desteklenir. Fiyatlara %20 KDV eklenir.
+
+## Organizasyon
+
+- cogitave: çekirdek ürünler (yuva, namzu, cogi)
+- cogitave-ai: model portları, ajan ve eklenti kayıt sistemi
+- cogitave-cloud: barındırılan servisler, API gateway
+- cogitave-labs: Ar-Ge, editör ve tarayıcı prototipleri
+- cogitave-services: sektörel çözümler, endüstriyel IoT
