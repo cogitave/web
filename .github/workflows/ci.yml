@@ -1,0 +1,54 @@
+# CI — the gate every change passes before it can reach main.
+#
+# The build IS the test suite here: it validates every app manifest and content
+# document against the committed schemas, refuses an unsourced quantitative
+# claim, refuses a price the pricing projection does not carry, and refuses a
+# redirect whose target it does not emit. A green run means those held.
+#
+# No dependencies to install (ADR-0003 in standards: build from scratch), so
+# there is no lockfile step and nothing to cache.
+
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Build
+        run: npm run check
+
+      # The projections (prices, design tokens) are committed here but authored
+      # in the estate. This repo cannot compare them to their canonical sources -
+      # those live in private repos - so `npm run check` reports the comparison
+      # as skipped rather than passing it silently. Drift is caught in the
+      # estate, where both sides are present. Assert the skip is explicit so a
+      # future change cannot make it quietly disappear.
+      - name: Projection provenance is stated, not assumed
+        run: |
+          npm run check 2>&1 | tee check.log
+          grep -q "drift  SKIPPED" check.log || {
+            echo "::error::expected the drift check to report that it could not compare"
+            exit 1
+          }
+
+      # The third-party-subresource rule is enforced inside the build itself, not
+      # here, so it holds for a local build and the dev server too - not only in
+      # CI. `npm run check` above already fails on a violation.

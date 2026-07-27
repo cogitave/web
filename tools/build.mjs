@@ -480,6 +480,52 @@ html:not(.js) .locale-switch { display: none; }
 }
 `;
 
+/* ------------------------------------------------------------------- gates */
+
+/**
+ * Refuse to emit a page that loads a subresource from a third-party origin.
+ *
+ * The site self-hosts its fonts and ships no CDN scripts, and that is a privacy
+ * property rather than a preference: an external stylesheet or script hands the
+ * visitor's IP to another operator before any consent decision, and puts a
+ * render-blocking request on someone else's uptime. Both pages this repo
+ * replaced did exactly that (Google Fonts on the landing, anime.js from jsdelivr
+ * on the deck), so the rule is enforced rather than remembered.
+ *
+ * Only FETCHING relations count. `rel="canonical"` and `rel="alternate"` carry
+ * absolute URLs by definition - they are metadata, not loads - and flagging them
+ * would make the gate cry wolf until someone switched it off.
+ */
+const FETCHING_REL = new Set([
+  'stylesheet', 'preload', 'modulepreload', 'prefetch', 'preconnect',
+  'dns-prefetch', 'icon', 'apple-touch-icon', 'manifest',
+]);
+
+function assertNoThirdPartySubresources(html, where, origin) {
+  const offenders = [];
+
+  for (const [tag] of html.matchAll(/<script\b[^>]*>/gi)) {
+    const src = /\bsrc="([^"]+)"/i.exec(tag)?.[1];
+    if (src && /^https?:\/\//i.test(src) && !src.startsWith(origin)) offenders.push(`script src=${src}`);
+  }
+
+  for (const [tag] of html.matchAll(/<link\b[^>]*>/gi)) {
+    const rel = /\brel="([^"]+)"/i.exec(tag)?.[1]?.toLowerCase();
+    const href = /\bhref="([^"]+)"/i.exec(tag)?.[1];
+    if (!rel || !href) continue;
+    if (!rel.split(/\s+/).some((r) => FETCHING_REL.has(r))) continue;   // metadata, not a load
+    if (/^https?:\/\//i.test(href) && !href.startsWith(origin)) offenders.push(`link rel=${rel} href=${href}`);
+  }
+
+  if (offenders.length) {
+    throw new Error(
+      `${where} loads a third-party subresource:\n  - ${offenders.join('\n  - ')}\n` +
+        'Self-host it. An external origin sees the visitor before any consent decision, ' +
+        'and the page then depends on someone else staying up.',
+    );
+  }
+}
+
 /* --------------------------------------------------------------------- SEO */
 
 // One URL per page, so no xhtml:link alternates - there is nothing to alternate
@@ -567,6 +613,8 @@ export async function build(argv = []) {
       documents, app, config, urlPath, components, pricing, args, structured,
     });
     for (const type of used) usedComponents.add(type);
+
+    assertNoThirdPartySubresources(html, urlPath, origin);
 
     const file = path.join(outDir, outputPathFor(urlPath));
     await mkdir(path.dirname(file), { recursive: true });

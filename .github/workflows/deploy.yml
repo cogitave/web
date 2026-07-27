@@ -1,0 +1,111 @@
+# Deploy — cogitave.com.
+#
+# Builds the static bundle and uploads it to Cloudflare Pages. Only `main`
+# deploys; a pull request builds under ci.yml and stops there.
+#
+# WHAT A HUMAN HAS TO DO ONCE, before this can run
+# ------------------------------------------------
+# This workflow deliberately holds no credentials. Add these in
+# Settings -> Secrets and variables -> Actions:
+#
+#   secret   CLOUDFLARE_API_TOKEN    a token scoped to "Cloudflare Pages: Edit"
+#                                    for the account below, and nothing else
+#   secret   CLOUDFLARE_ACCOUNT_ID   the Cloudflare account id
+#   variable CLOUDFLARE_PAGES_PROJECT  the Pages project name
+#                                      (defaults to cogitave-web)
+#
+# The token is least-privilege on purpose: Pages:Edit cannot touch DNS, Workers,
+# or the zone. Rotate it on the schedule in the security standard; nothing here
+# needs changing when you do.
+#
+# Why wrangler is acceptable here even though the estate builds from scratch:
+# ADR-0003 governs what ships and what the BUILD depends on - the bundle this
+# uploads still has zero runtime dependencies. wrangler is the provider's own CLI
+# used at deploy time, in the same category as `git` or `node` themselves, and it
+# never enters the artifact. Moving provider means editing this file only.
+
+name: deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  deployments: write
+
+# One deploy at a time, and never cancel one midway: a half-uploaded site is
+# worse than a slightly stale one.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://cogitave.com
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # Build before touching the deploy credentials: a failing build must never
+      # reach the step that can change what the public sees.
+      - name: Build
+        run: npm run check
+
+      - name: Refuse to deploy an app that is not live
+        run: |
+          if grep -qE '^\s+status: (planned|staged)\s*(#.*)?$' site.config.yaml; then
+            echo "::error::an app in the registry is still planned/staged - promote it or remove it before deploying"
+            grep -nE '^\s+(- id|status):' site.config.yaml
+            exit 1
+          fi
+          echo "every registered app is live"
+
+      # Fail with the reason rather than with wrangler's "authentication error".
+      # A deploy that cannot run because it was never configured should say so in
+      # one line, not send someone reading provider docs.
+      - name: Credentials are configured
+        run: |
+          missing=""
+          [ -n "${{ secrets.CLOUDFLARE_API_TOKEN }}" ] || missing="$missing\n  secret   CLOUDFLARE_API_TOKEN    (scope: Cloudflare Pages -> Edit)"
+          [ -n "${{ secrets.CLOUDFLARE_ACCOUNT_ID }}" ] || missing="$missing\n  secret   CLOUDFLARE_ACCOUNT_ID   (Cloudflare account id)"
+          if [ -n "$missing" ]; then
+            echo "::error::deploy is not configured yet. Add these under Settings -> Secrets and variables -> Actions:$(printf "$missing")"
+            echo "Nothing was deployed. Add them, then re-run this workflow (Actions -> deploy -> Run workflow)."
+            exit 1
+          fi
+          echo "credentials present"
+
+      - name: Publish to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: >-
+            pages deploy _site
+            --project-name=${{ vars.CLOUDFLARE_PAGES_PROJECT || 'cogitave-web' }}
+            --branch=main
+            --commit-dirty=true
+
+      # Deploying is not the same as being live. Check the thing a visitor gets.
+      - name: Verify the live site actually changed
+        run: |
+          sleep 20
+          for attempt in 1 2 3 4 5; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' https://cogitave.com/namzu/ || true)
+            if [ "$code" = "200" ]; then
+              echo "cogitave.com/namzu/ is serving (200)"
+              exit 0
+            fi
+            echo "attempt $attempt: /namzu/ returned $code, retrying"
+            sleep 15
+          done
+          echo "::error::the deploy reported success but https://cogitave.com/namzu/ is not serving"
+          exit 1

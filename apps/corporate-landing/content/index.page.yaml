@@ -235,6 +235,8 @@ blocks:
       headline: Üretime almak istediğiniz şeyi konuşalım
       body: Problemi anlatın, ajanın doğru cevap olup olmadığını söyleyelim.
       cta: { label: İletişime geçin, href: "mailto:hello@cogitave.com" }
-      secondary:
-        label: Zaten müşterimiz misiniz? Ödemenizi buradan yapın
-        href: https://pay.cogitave.com/
+      # The "pay here" link is withheld until pay.cogitave.com answers. Shipping a
+      # link to a host that does not resolve is worse for a paying customer than
+      # having no link, and ADR-0004 moved checkout off this surface precisely so
+      # payment stops being something the marketing page improvises. Restore this
+      # `secondary` block when the payments property is live.
