@@ -56,8 +56,21 @@ jobs:
 
       # Build before touching the deploy credentials: a failing build must never
       # reach the step that can change what the public sees.
+      #
+      # This must produce the directory the publish step uploads. `npm run check`
+      # builds into .cache/check and would leave _site absent - which is exactly
+      # how a deploy reaches Cloudflare with nothing to upload.
       - name: Build
-        run: npm run check
+        run: node tools/build.mjs --check-drift
+
+      - name: The artifact exists
+        run: |
+          test -f _site/index.html && test -f _site/namzu/index.html || {
+            echo "::error::the build did not produce _site/ - nothing to deploy"
+            ls -la _site 2>/dev/null || echo "_site does not exist"
+            exit 1
+          }
+          echo "_site/ contains $(find _site -type f | wc -l) files"
 
       - name: Refuse to deploy an app that is not live
         run: |
@@ -128,9 +141,11 @@ jobs:
 
           if [ -n "$name" ]; then
             echo "resolved by domain: $SITE_DOMAIN is served by Pages project \"$name\""
+            echo "DOMAIN_ATTACHED=1" >> "$GITHUB_ENV"
           elif [ -n "${OVERRIDE:-}" ] && printf '%s' "$projects" | jq -e --arg n "$OVERRIDE" '.result[] | select(.name == $n)' >/dev/null; then
             name="$OVERRIDE"
             echo "::warning::no Pages project serves $SITE_DOMAIN yet; falling back to CLOUDFLARE_PAGES_PROJECT=\"$name\". This deploy will publish to that project's *.pages.dev URL, and $SITE_DOMAIN will NOT change until the custom domain is attached to it."
+            echo "DOMAIN_ATTACHED=0" >> "$GITHUB_ENV"
           else
             # Nothing serves the domain and the named project does not exist, so
             # this is a first deploy into an empty account. Create the project
@@ -154,7 +169,7 @@ jobs:
             fi
 
             echo "::warning::created Pages project \"$name\". This deploy publishes to https://$name.pages.dev/ — $SITE_DOMAIN will NOT change until you attach it as a custom domain to that project."
-            echo "FIRST_DEPLOY=1" >> "$GITHUB_ENV"
+            echo "DOMAIN_ATTACHED=0" >> "$GITHUB_ENV"
           fi
 
           echo "name=$name" >> "$GITHUB_OUTPUT"
@@ -176,7 +191,7 @@ jobs:
       # purpose: the project already serves the new site, so the cutover is
       # domain -> working site, never domain -> empty project.
       - name: Attach the custom domain
-        if: env.FIRST_DEPLOY == '1'
+        if: env.DOMAIN_ATTACHED != '1'
         env:
           CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CF_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -207,7 +222,7 @@ jobs:
         env:
           PROJECT: ${{ steps.project.outputs.name }}
         run: |
-          if [ "${FIRST_DEPLOY:-0}" = "1" ]; then
+          if [ "${DOMAIN_ATTACHED:-1}" != "1" ]; then
             target="https://$PROJECT.pages.dev"
             echo "first deploy: verifying $target (cogitave.com is not attached to this project yet)"
           else
@@ -219,7 +234,7 @@ jobs:
             code=$(curl -s -o /dev/null -w '%{http_code}' "$target/namzu/" || true)
             if [ "$code" = "200" ]; then
               echo "$target/namzu/ is serving (200)"
-              if [ "${FIRST_DEPLOY:-0}" = "1" ]; then
+              if [ "${DOMAIN_ATTACHED:-1}" != "1" ]; then
                 echo "::notice::The new site is live at $target — but cogitave.com still serves the old one. Attach cogitave.com as a custom domain to the \"$PROJECT\" Pages project to switch it over."
               fi
               exit 0
