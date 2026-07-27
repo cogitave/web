@@ -132,8 +132,29 @@ jobs:
             name="$OVERRIDE"
             echo "::warning::no Pages project serves $SITE_DOMAIN yet; falling back to CLOUDFLARE_PAGES_PROJECT=\"$name\". This deploy will publish to that project's *.pages.dev URL, and $SITE_DOMAIN will NOT change until the custom domain is attached to it."
           else
-            echo "::error::no Pages project serves $SITE_DOMAIN, and CLOUDFLARE_PAGES_PROJECT ${OVERRIDE:+(\"$OVERRIDE\") }does not name an existing project. Attach the domain to a Pages project, or set the variable to a project that exists."
-            exit 1
+            # Nothing serves the domain and the named project does not exist, so
+            # this is a first deploy into an empty account. Create the project
+            # rather than stopping: it is idempotent, it publishes to a
+            # *.pages.dev URL, and it changes nothing a visitor sees. Attaching
+            # the custom domain stays a deliberate human step, because THAT is
+            # the moment the live site changes and it can break whatever serves
+            # it today.
+            name="${OVERRIDE:-cogitave-web}"
+            echo "no Pages project serves $SITE_DOMAIN and \"$name\" does not exist yet - creating it"
+
+            created=$(curl -sS -X POST \
+              -H "Authorization: Bearer $CF_API_TOKEN" \
+              -H "Content-Type: application/json" \
+              --data "{\"name\":\"$name\",\"production_branch\":\"main\"}" \
+              "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/pages/projects")
+
+            if [ "$(printf '%s' "$created" | jq -r '.success // false')" != "true" ]; then
+              echo "::error::could not create the Pages project \"$name\": $(printf '%s' "$created" | jq -rc '[.errors[]? | "\(.code): \(.message)"] | join("; ")')"
+              exit 1
+            fi
+
+            echo "::warning::created Pages project \"$name\". This deploy publishes to https://$name.pages.dev/ — $SITE_DOMAIN will NOT change until you attach it as a custom domain to that project."
+            echo "FIRST_DEPLOY=1" >> "$GITHUB_ENV"
           fi
 
           echo "name=$name" >> "$GITHUB_OUTPUT"
@@ -149,18 +170,62 @@ jobs:
             --branch=main
             --commit-dirty=true
 
-      # Deploying is not the same as being live. Check the thing a visitor gets.
-      - name: Verify the live site actually changed
+      # Point the domain at what we just published. This runs only on a first
+      # deploy - once the domain is attached, the resolve step finds the project
+      # by domain and this is skipped forever. It runs AFTER the deploy on
+      # purpose: the project already serves the new site, so the cutover is
+      # domain -> working site, never domain -> empty project.
+      - name: Attach the custom domain
+        if: env.FIRST_DEPLOY == '1'
+        env:
+          CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          PROJECT: ${{ steps.project.outputs.name }}
+          SITE_DOMAIN: cogitave.com
         run: |
+          set -uo pipefail
+          attached=$(curl -sS -X POST \
+            -H "Authorization: Bearer $CF_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            --data "{\"name\":\"$SITE_DOMAIN\"}" \
+            "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/pages/projects/$PROJECT/domains")
+
+          if [ "$(printf '%s' "$attached" | jq -r '.success // false')" = "true" ]; then
+            echo "::notice::$SITE_DOMAIN attached to \"$PROJECT\". DNS may take a few minutes to propagate."
+          else
+            # Not fatal: the deploy itself succeeded and is live on *.pages.dev.
+            # Attaching needs DNS rights the deploy token may not carry, and it
+            # is the one step a human can finish in the dashboard in seconds.
+            echo "::warning::could not attach $SITE_DOMAIN automatically: $(printf '%s' "$attached" | jq -rc '[.errors[]? | "\(.code): \(.message)"] | join("; ")'). The new site IS live on https://$PROJECT.pages.dev/ — attach the domain to that project in the Cloudflare dashboard to switch $SITE_DOMAIN over."
+          fi
+
+      # Deploying is not the same as being live. Check the thing a visitor gets -
+      # at the URL this deploy can actually affect. On a first deploy the custom
+      # domain may not be attached yet, so checking cogitave.com would fail for a
+      # reason that has nothing to do with whether the deploy worked.
+      - name: Verify the deployed site actually serves
+        env:
+          PROJECT: ${{ steps.project.outputs.name }}
+        run: |
+          if [ "${FIRST_DEPLOY:-0}" = "1" ]; then
+            target="https://$PROJECT.pages.dev"
+            echo "first deploy: verifying $target (cogitave.com is not attached to this project yet)"
+          else
+            target="https://cogitave.com"
+          fi
+
           sleep 20
           for attempt in 1 2 3 4 5; do
-            code=$(curl -s -o /dev/null -w '%{http_code}' https://cogitave.com/namzu/ || true)
+            code=$(curl -s -o /dev/null -w '%{http_code}' "$target/namzu/" || true)
             if [ "$code" = "200" ]; then
-              echo "cogitave.com/namzu/ is serving (200)"
+              echo "$target/namzu/ is serving (200)"
+              if [ "${FIRST_DEPLOY:-0}" = "1" ]; then
+                echo "::notice::The new site is live at $target — but cogitave.com still serves the old one. Attach cogitave.com as a custom domain to the \"$PROJECT\" Pages project to switch it over."
+              fi
               exit 0
             fi
             echo "attempt $attempt: /namzu/ returned $code, retrying"
             sleep 15
           done
-          echo "::error::the deploy reported success but https://cogitave.com/namzu/ is not serving"
+          echo "::error::the deploy reported success but $target/namzu/ is not serving"
           exit 1
