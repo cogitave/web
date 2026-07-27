@@ -12,10 +12,52 @@ level: beginner
 
 # web — marketing/web platform shell
 
-This is the **core**, ready for apps to drop in. It is the source of the
+This is the **core**, and it now carries its first app. It is the source of the
 `marketing-site` property (cogitave.com / www in [`cogitave/bootstrap/domains.yaml`](../bootstrap/domains.yaml)).
-It is intentionally a **skeleton**: structure + configs + conventions + minimal
-stubs — not a finished site. A finished site is assembled by *dropping apps in*.
+The shell is structure + configs + conventions + the build; a finished site is
+assembled by *dropping apps in*. The homepage,
+[`apps/corporate-landing/`](apps/corporate-landing/), is the worked example of
+that — read it before authoring a second app.
+
+## Build and develop
+
+```bash
+npm run build         # static bundle -> _site/
+npm run check         # build + drift gate - the CI gate
+npm run dev           # dev server on :4173 with live reload
+npm run sync:estate   # refresh the projections (estate only, see below)
+```
+
+No dependencies to install: the build is Node >= 22 and the standard library
+only. `npm run dev` watches content, components, schemas and the projections,
+rebuilds in tens of milliseconds, and pushes a reload over SSE; a build failure
+shows as an error overlay in the browser rather than serving a stale page.
+
+### This repo stands alone
+
+`npm run build` works in a standalone clone of `cogitave/web`, with no estate
+around it — verified by building an extracted copy and diffing the output.
+
+That matters because two inputs are authored in **private** repos: the published
+prices (`corp/gtm`) and the DTCG design tokens (`cogitave/design`). A public
+repo's build must not read a private tree — it breaks the moment the repo is
+cloned by itself, and it couples public output to private data. So the estate
+holds the canonical sources and [`tools/sync-estate.mjs`](tools/sync-estate.mjs)
+writes committed **projections** into this repo:
+
+| Projection | Canonical source |
+|---|---|
+| [`content/pricing/services-catalog.published.yaml`](content/pricing/) | `corp/gtm/pricing/services-catalog.yaml` |
+| [`design/tokens.json`](design/) | `cogitave/design/tokens.json` |
+
+Only what the site already exposes crosses: prices printed on the page, token
+values that reach the stylesheet anyway. Engagement types, SLA profiles and
+internal pricing notes stay in corp.
+
+`npm run check` fails if a projection has gone stale — but **only where the
+canonical source is reachable**. In a standalone clone it says so explicitly
+rather than passing quietly, so a green check never implies a comparison that did
+not happen.
 
 > [!NOTE]
 > Build-from-scratch ethos applies (see [ADR-0003 in standards](../standards/docs/decisions/0003-build-from-scratch-reference-not-dependency.md)).
@@ -98,8 +140,10 @@ Full walkthrough: [`docs/adding-an-app.md`](docs/adding-an-app.md).
 | [`design/`](design/) | Design tokens ([`tokens.json`](../design/tokens.json), DTCG) + brand usage — the design-system single source. |
 | [`seo/`](seo/) | Metadata, sitemap, `robots.txt`, structured data (JSON-LD), `llms.txt`. |
 | [`analytics/`](analytics/) | Privacy-respecting, consent-gated analytics ([`consent.config.json`](analytics/consent.config.json)). |
-| [`i18n/`](i18n/) | Localization conventions (English-only today, locale-ready). |
+| [`i18n/`](i18n/) | Locale routing: subdirectory, default locale unprefixed, never an automatic redirect ([ADR-0003](docs/decisions/0003-locale-routing.md)). |
 | [`a11y/`](a11y/) | WCAG 2.2 AA notes + CI gates. |
+| [`assets/`](assets/) | Static media served as-is: brand marks, third-party logos, and the self-hosted web faces ([`assets/fonts/README.md`](assets/fonts/README.md) records what they are and the licence position). |
+| [`tools/`](tools/) | The build (`build.mjs`), the dev server with live reload (`serve.mjs`), and `lib/` — our YAML subset parser, DTCG token transform, JSON Schema validator, HTML emitter and analytics generator. Zero dependencies. |
 | [`docs/`](docs/) | [architecture](docs/architecture.md), [adding-an-app](docs/adding-an-app.md), [ADRs](docs/decisions/). |
 
 ## Standards this shell follows

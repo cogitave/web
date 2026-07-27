@@ -23,3 +23,8 @@ dist/
 build/
 target/
 coverage/
+
+# build output — the bundle is reproducible from source, never committed
+# (site.config.yaml build.output: static -> _site/, edge -> _edge/)
+_site/
+_edge/

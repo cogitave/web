@@ -1,0 +1,20 @@
+{
+  "$schema": "../app.manifest.schema.json",
+  "id": "namzu-solutions",
+  "kind": "landing",
+  "title": "Autonomous agent solutions with namzu",
+  "description": "The customer-facing walkthrough of namzu and the work around it, at /namzu (en) and /tr/namzu. Ported from a standalone presentation file into the content model.",
+  "route": "/namzu",
+  "property": "marketing-site",
+  "render": { "mode": "static" },
+  "content": { "root": "content/", "entry": "index.page.yaml" },
+  "components": ["deck-slide"],
+  "seo": {
+    "noindex": false,
+    "structuredData": ["organization"]
+  },
+  "i18n": { "locales": ["tr", "en"] },
+  "analytics": { "events": ["cta_click", "locale_switch"] },
+  "owner": "cogitave/web",
+  "status": "staged"
+}

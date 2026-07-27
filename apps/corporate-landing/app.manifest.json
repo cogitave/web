@@ -1,0 +1,49 @@
+{
+  "$schema": "../app.manifest.schema.json",
+  "id": "corporate-landing",
+  "kind": "landing",
+  "title": "Cogitave — AI for agents",
+  "description": "The cogitave.com homepage: the service catalog, the core products (yuva, namzu, cogi), and the research index. Shipped in English at / and Turkish at /tr/ per ADR-0003.",
+  "route": "/",
+  "property": "marketing-site",
+  "render": {
+    "mode": "static"
+  },
+  "content": {
+    "root": "content/",
+    "entry": "index.page.yaml"
+  },
+  "components": [
+    "hero",
+    "service-catalog",
+    "product-grid",
+    "research-list",
+    "org-list",
+    "partner-strip",
+    "cta"
+  ],
+  "seo": {
+    "noindex": false,
+    "structuredData": [
+      "organization"
+    ]
+  },
+  "i18n": {
+    "locales": [
+      "tr",
+      "en"
+    ]
+  },
+  "analytics": {
+    "events": [
+      "cta_click",
+      "service_category_open",
+      "service_offer_open",
+      "product_panel_open",
+      "research_panel_open",
+      "locale_switch"
+    ]
+  },
+  "owner": "cogitave/web",
+  "status": "staged"
+}

@@ -1,0 +1,16 @@
+{
+  "name": "@cogitave/web",
+  "private": true,
+  "type": "module",
+  "description": "Source and build for cogitave.com — the from-scratch marketing/web platform shell. Zero runtime dependencies by design (ADR-0003: build from scratch, reference not dependency).",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "node tools/build.mjs",
+    "check": "node tools/build.mjs --out .cache/check --check-drift",
+    "dev": "node tools/serve.mjs",
+    "sync:estate": "node tools/sync-estate.mjs"
+  }
+}

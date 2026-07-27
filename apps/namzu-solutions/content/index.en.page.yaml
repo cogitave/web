@@ -1,0 +1,505 @@
+### YamlMime:Page
+# The namzu solutions deck, English (served at /namzu).
+#
+# Ported from a standalone 1,964-line HTML file that carried Turkish and English
+# side by side in every slide. That bilingual pairing is why this deck splits so
+# cleanly into locale siblings: the English here and the Turkish in
+# index.tr.page.yaml are the SAME slides, and they share this UID.
+#
+# Every figure below keeps the citation the original carried. The deck's own
+# claim is "the numbers aren't ours; they're from research" — the build enforces
+# it: a statistic with no `source` and no `qualitative` flag fails.
+uid: cogitave.web.page.namzu-solutions
+title: Autonomous agent solutions with namzu
+description: How namzu runs your processes autonomously while control stays with you — sandbox isolation, budget caps, human approval gates and a full audit trail, plus the consulting and enterprise-systems work around it.
+locale: en
+seo:
+  metaTitle: Cogitave · Autonomous agent solutions with namzu
+  metaDescription: Let your processes run themselves; keep control in your hands. An 18-part walkthrough of the open-source agent kernel namzu — isolation, budgets, memory, audit — and the consulting, enterprise-systems and infrastructure work around it.
+  ogImage: /assets/brand/og-namzu.png
+  structuredData:
+    - organization
+blocks:
+  - type: deck-slide
+    id: cover
+    data:
+      variant: cover
+      kicker: Autonomous agent solutions · namzu
+      title: Let your processes run themselves; keep control in your hands.
+      lead: Your operations, support and data work, handed to agents you own — on any language model, in the cloud or fully local.
+      flow:
+        - { label: Your processes, detail: Ops · support · data }
+        - { label: Agents built for you, detail: Isolation · budget · memory · audit }
+        - { label: namzu, detail: The agent kernel underneath }
+        - { label: Any language model, detail: Cloud or fully local · Ollama · LM Studio }
+
+  - type: deck-slide
+    id: opportunity
+    data:
+      kicker: The opportunity
+      title: AI can do much more.
+      lead: >-
+        AI no longer just answers; it runs processes. The gap is between using AI
+        and creating value with it, and it starts with the right kernel and the
+        right setup.
+      stats:
+        - value: 78%
+          label: of organizations already use AI in at least one function
+          source: { cite: "McKinsey, Global Survey on AI" }
+        - value: 40%+
+          label: of agentic projects are forecast to be cancelled by the end of 2027
+          source: { cite: Gartner }
+        - value: 95%
+          label: of generative AI pilots deliver no measurable return
+          source: { cite: MIT }
+      cards:
+        - marker: A
+          title: Pilots that stall
+          body: >-
+            The wave is still building — Deloitte predicts that by 2027 half of
+            GenAI-using companies will run agentic pilots. The edge belongs to
+            those who get past the pilot.
+        - marker: B
+          title: Repetitive manual work
+          body: >-
+            Teams burn their time on data entry, document checks and copy-paste
+            between systems. Asana's research finds 58% of the workday goes to
+            "work about work" instead of the work itself.
+        - marker: C
+          title: Uncontrolled tool sprawl
+          body: >-
+            Every team tries a different AI tool and there is no single security
+            model. IBM finds unsanctioned "shadow AI" present in 20% of breaches,
+            adding an average 670,000 dollars per breach.
+
+  - type: deck-slide
+    id: stack
+    data:
+      kicker: Our stack · Cogitave
+      title: The team building agent infrastructure from the ground up.
+      lead: >-
+        The market is full of thin wrappers over off-the-shelf models. Our focus
+        is a different point: we engineer the infrastructure agents run on, with
+        discipline and open standards.
+      cards:
+        - marker: 01 / Agent operating system
+          title: yuva
+          body: >-
+            The operating layer where agents are scheduled, authorized and
+            observed. Runs on bare metal or as a KVM guest. Critical kernel
+            components are machine-proven with Kani, and memory records are
+            tamper-evident and signed.
+          tag: Open source
+        - marker: 02 / Agent kernel
+          title: namzu
+          body: >-
+            The open-source kernel every agent sits on. Isolation, budgets,
+            durable memory and an audit trail, with your own interface on top.
+          tag: Open source
+        - marker: 03 / Orchestrator agent
+          title: cogi
+          body: >-
+            The autonomous orchestrator that learns your company from how you use
+            it and distils its own model.
+          tag: Coming soon
+      stats:
+        - value: 11.1x
+          label: faster to first instruction than Firecracker
+          body: >-
+            Measured on the same host with the same byte-identical guest under
+            both VMMs — the only apples-to-apples comparison the benchmark
+            supports.
+          source:
+            cite: yuva benchmarks, axis-A (same guest, same runner)
+            href: https://github.com/cogitave/yuva/blob/main/docs/BENCHMARKS.md
+
+  - type: deck-slide
+    id: what-is-namzu
+    data:
+      kicker: What is namzu?
+      title: A secure kernel for your agents.
+      lead: >-
+        What an operating system kernel is to your computer, namzu is to your AI
+        agents: it isolates every agent, caps its spending, manages its memory and
+        records everything it does. Splitting big jobs across sub-agents is the
+        kernel's job too — delegation ships with isolation and budgets built in.
+      cards:
+        - marker: "01"
+          title: Isolation
+          body: >-
+            Every agent runs in an isolated sandbox; file and network access is
+            denied by default. Isolation is tiered — process, container, micro-VM
+            — and at the micro-VM tier the choice is yours: Firecracker or yuva.
+            The tier changes; the agent code never does.
+        - marker: "02"
+          title: Budget control
+          body: Token, cost, time and iteration limits are set per run. No surprise bills.
+        - marker: "03"
+          title: Durable memory
+          body: >-
+            Agents keep what they learn and resume where they stopped;
+            a checkpoint is taken at every step. The checkpoint store is
+            pluggable — a file, or your own database.
+        - marker: "04"
+          title: Audit trail
+          body: >-
+            Every step lands in an event stream, so audit and reporting are a
+            by-product of normal operation rather than a project.
+
+  - type: deck-slide
+    id: how-it-works
+    data:
+      kicker: How it works
+      title: One kernel, an end-to-end flow.
+      lead: Your interface stays yours. What sits underneath is the part we build.
+      flow:
+        - { label: Your interface, detail: CLI · API · web · ERP }
+        - { label: namzu, detail: Planning · memory · budgets }
+        - { label: Harness, detail: Allowlisted tools · verification gates }
+        - { label: Sandbox, detail: Process · container · micro-VM }
+
+  - type: deck-slide
+    id: use-cases
+    data:
+      kicker: Use cases
+      title: What can you build with namzu?
+      lead: >-
+        Same kernel, different jobs. Every scenario below can be built today, and
+        each ships with isolation, budgets and an audit trail.
+      cards:
+        - marker: "01"
+          title: Documents and back office
+          body: >-
+            Data is extracted from invoices, contracts and forms, validated and
+            posted; paperwork becomes records, not backlog.
+          tag: Operations
+        - marker: "02"
+          title: Expenses and procurement
+          body: >-
+            Receipts are read and checked against policy, exceptions go to
+            approval, and purchase requests move with budget control.
+          tag: Finance
+        - marker: "03"
+          title: Support and triage
+          body: >-
+            Incoming requests are classified, routed and answered from your own
+            knowledge base, with escalation where judgement is needed.
+          tag: Support
+        - marker: "04"
+          title: Data and reporting
+          body: >-
+            Recurring extracts, reconciliations and reports run on schedule, with
+            every step traceable.
+          tag: Data
+
+  - type: deck-slide
+    id: example
+    data:
+      kicker: One example, end to end
+      title: "A familiar pain: expense entry."
+      lead: >-
+        Accounting's end-of-month rush is the sum of many small costs. This is the
+        shape of handing one of them over.
+      stats:
+        - value: 20 min · $58
+          label: to process a single expense report, on average
+          source: { cite: GBTA }
+        - value: 19%
+          label: of reports contain errors, and each correction takes another 18 minutes
+          source: { cite: GBTA }
+      flow:
+        - { label: Receipt arrives, detail: The employee sends a photo }
+        - { label: The agent reads and classifies, detail: Amount · category · policy }
+        - { label: Human approval on exceptions, detail: Only outliers are escalated }
+        - { label: Recorded and reported, detail: "Posted to the system, with the trail" }
+
+  - type: deck-slide
+    id: efficiency
+    data:
+      kicker: Efficiency
+      title: Where does the efficiency come from?
+      lead: >-
+        The gains come not just from speed, but from work that runs continuously,
+        at predictable cost, with human approval at the critical points.
+      stats:
+        - value: 24/7
+          label: Continuous operation
+          body: Agents keep no office hours; work moves at night and on holidays.
+          qualitative: true
+        - value: 100%
+          label: Traceable actions
+          body: Every step lands in the event stream, so audit and reporting come built in.
+          qualitative: true
+        - value: "0"
+          label: Default access
+          body: >-
+            The sandbox starts closed. File and network permissions are opened
+            deliberately, one at a time.
+          qualitative: true
+
+  - type: deck-slide
+    id: proven
+    data:
+      kicker: Proven efficiency
+      title: The numbers aren't ours; they're from research.
+      lead: >-
+        AI's productivity impact is no longer anecdotal — it has been measured in
+        peer-reviewed studies and large-scale field experiments. Every figure below
+        comes from a published study.
+      stats:
+        - value: +15%
+          label: Call-centre productivity
+          body: Issues resolved per hour, and +34% for newer staff. Field study of 5,172 agents.
+          source: { cite: "Stanford & MIT, peer-reviewed (QJE, 2025)" }
+        - value: +26%
+          label: More developer output
+          body: >-
+            Randomized field experiments with roughly 5,000 developers at
+            Microsoft and Accenture: completed tasks up 26%.
+          source: { cite: "Cui et al. (2024)" }
+        - value: 1 ≈ 2
+          label: One person with AI matches a team of two
+          body: >-
+            Field experiment with 776 P&G professionals: individuals with AI
+            matched the performance of teams without it.
+          source: { cite: "Harvard & Wharton (NBER, 2025)" }
+
+  - type: deck-slide
+    id: security
+    data:
+      kicker: Security and compliance
+      title: Enterprise trust, by design.
+      lead: >-
+        Per IBM's 2025 breach report, 97% of organizations hit by an AI-related
+        breach lacked AI access controls. In namzu, control isn't bolted on later;
+        it is the default.
+      cards:
+        - marker: A
+          title: What if the agent gets tricked?
+          body: >-
+            OWASP's number one LLM risk is prompt injection — tricking an agent
+            into abusing its authority. In namzu, tools are allowlisted, every
+            boundary validates input, and critical output passes a verification
+            gate.
+        - marker: B
+          title: What if the agent goes rogue?
+          body: >-
+            The sandbox is closed by default: file and network access opens
+            deliberately, one permission at a time. You choose the isolation
+            backend — yuva or Firecracker.
+        - marker: C
+          title: What if it oversteps?
+          body: >-
+            Least privilege: an agent sees only the tools its task needs,
+            destructive commands are blocked outright in the harness, and
+            high-impact steps go to a human.
+
+  - type: deck-slide
+    id: transparency
+    data:
+      kicker: Transparency and trust
+      title: Not a black box; open end to end.
+      lead: >-
+        Tools like the Vercel AI SDK and the OpenAI Agents SDK tie you to their
+        platforms, with tracing and traffic running through their cloud. Closed
+        enterprise products don't even let you inspect the box. namzu is the
+        opposite — and transparency is no longer optional: the EU AI Act is
+        phasing in, turning auditability into an obligation.
+      cards:
+        - marker: Code
+          title: Open source, end to end
+          body: >-
+            You have the right to know what runs at your core. All of namzu's
+            source is open; you can audit exactly what you run, line by line, at
+            any time.
+        - marker: Data
+          title: Your messages stay yours
+          body: >-
+            The SDK sends no user messages or logs to us; there is no hidden
+            telemetry. Your data never leaves your organization.
+        - marker: Sectors
+          title: From the bank to the factory floor
+          body: >-
+            The same control model travels across regulated and operational
+            environments, because it is a property of the kernel rather than of a
+            deployment.
+
+  - type: deck-slide
+    id: services
+    data:
+      kicker: What we offer
+      title: Not just agents; the whole system.
+      lead: >-
+        We consult at every step of the AI journey: from strategy to architecture,
+        from traditional enterprise system consulting to classic software and
+        servicification needs. If what you need is not an off-the-shelf product but
+        a system designed around you, we design it together.
+      cards:
+        - marker: Consulting
+          title: An end-to-end thinking partner
+          body: >-
+            Strategy, architecture, model selection, data and security — a
+            vendor-independent thinking partner across every decision.
+        - marker: Development
+          title: Development, handed to agents
+          body: >-
+            Integration work can be handed to agents; customer-reported bugs are
+            met by an agent first, and humans only approve.
+        - marker: Infra
+          title: Infrastructure built for you
+          body: >-
+            Defined as code, provider-independent, and operated with the same
+            discipline wherever it runs.
+
+  - type: deck-slide
+    id: enterprise-systems
+    data:
+      kicker: Enterprise systems
+      title: Enterprise systems, our native tongue.
+      lead: >-
+        We spent years on SAP and Microsoft Dynamics projects: we know from the
+        field how ERP and CRM systems live, where they clog and what it costs. That
+        experience connects the AI layer to your existing system at exactly the
+        right point. The agent layer doesn't sit next to your ERP; it speaks from
+        within it.
+      cards:
+        - marker: 01 / The enterprise core
+          title: SAP
+          body: >-
+            Process adaptation, module development and integration. The agent
+            layer connects at the right point without disturbing your existing SAP
+            landscape.
+        - marker: 02 / Daily operations
+          title: Dynamics NAV / Business Central
+          body: >-
+            Customization, reporting and extension development where your daily
+            operations flow.
+        - marker: 03 / Scale
+          title: Dynamics 365 F&O
+          body: Finance and operations work for larger landscapes, connected the same way.
+        - marker: 04 / The customer side
+          title: CRM
+          body: Customer processes wired into the same agent layer, not bolted beside it.
+
+  - type: deck-slide
+    id: infrastructure
+    data:
+      kicker: Infrastructure solutions
+      title: Infrastructure built for you; provider-independent.
+      lead: >-
+        The same discipline on Azure and on AWS: we define your infrastructure as
+        code and build it provider-independent. On Azure today, on AWS tomorrow, or
+        both at once — the architecture locks you into no cloud.
+      cards:
+        - marker: Multi-cloud
+          title: Azure · AWS · your pick
+          body: >-
+            Business needs pick the provider; the architecture stays the same on
+            both. On-premise deployment is always on the table.
+        - marker: Fleet
+          title: Fleet management
+          body: >-
+            Hundreds of devices and agents from one panel: version rollout, health
+            tracking, remote intervention. The same fleet discipline from field
+            kiosks to cloud agents.
+        - marker: Scale
+          title: Dynamic scaling
+          body: >-
+            Resources grow with load and shrink when idle; you pay for usage, not
+            capacity. Scaling curves tuned for agent workloads.
+
+  - type: deck-slide
+    id: industrial
+    data:
+      kicker: Industrial operations
+      title: "The factory floor: every machine, one foundation."
+      lead: >-
+        On the factory floor our work starts in the field, not at a desk. We
+        design, build and install the hardware for operator workflows: machines
+        connect to one machine, agents track the process and its anomalies, and the
+        operation is handed over step by step with control staying yours.
+      stats:
+        - value: $1.4T
+          label: the annual cost of unplanned downtime to the world's 500 largest companies
+          body: Around 11% of their revenues.
+          source: { cite: Siemens }
+      flow:
+        - { label: Field machines, detail: The operator's equipment }
+        - { label: One machine · edge, detail: "All equipment, one point" }
+        - { label: Agents, detail: Process and anomaly tracking }
+        - { label: Operations, detail: Report · intervene · record }
+
+  - type: deck-slide
+    id: native
+    data:
+      kicker: Native development
+      title: Every device, in its own language.
+      lead: >-
+        Frameworks that squeeze an app into one codebase look cheap on paper; the
+        bill arrives in the field. Airbnb dropped React Native in 2018 after two
+        years of investment, and Dropbox abandoned its shared codebase in 2019,
+        finding it more expensive than writing the code twice. We cut that bill up
+        front.
+      cards:
+        - marker: iOS
+          title: Swift and SwiftUI
+          body: >-
+            A first-class citizen of the Apple ecosystem: new OS features land in
+            your product on day one, and the interface feels like the platform
+            itself.
+        - marker: Android
+          title: Kotlin and Compose
+          body: >-
+            From phones to tablets to Android-based kiosks: direct access to
+            camera, NFC, BLE and serial ports, with a fluid interface even on
+            constrained hardware.
+        - marker: Web
+          title: Web, where it belongs
+          body: >-
+            When reach comes first, the web is the right tool, and we build it with
+            the same discipline. Ideology doesn't pick the stack; the device's needs
+            and the usage scenario do.
+
+  - type: deck-slide
+    id: how-we-work
+    data:
+      kicker: How we work
+      title: From idea to production, we're with you.
+      lead: >-
+        Whatever the scope, the discipline is the same: start small, measure,
+        prove, scale. At every step the experienced team that writes the kernel is
+        at the table.
+      cards:
+        - marker: 01 / Discovery
+          title: Strategy session
+          body: >-
+            We review your processes together and identify the highest-potential
+            work and the success metrics. The first discovery call is free.
+        - marker: 02 / Pilot
+          title: Pilot project
+          body: >-
+            Within weeks a tightly scoped pilot runs on your real data; the
+            decision to continue is made together, on measured results.
+        - marker: 03 / Production
+          title: Rollout and operation
+          body: >-
+            The proven pilot goes to production with monitoring, approval gates and
+            an audit trail, and keeps being operated rather than handed over and
+            forgotten.
+
+  - type: deck-slide
+    id: contact
+    data:
+      variant: close
+      kicker: Let's meet
+      title: We can't wait to meet you.
+      lead: >-
+        We do this work with passion: from the kernel to the hardware, from the
+        field to the cloud. Hearing your processes, designing the right system
+        together and watching it run in production is the part we love most. Our
+        door is open, the coffee is ready.
+      contact:
+        - { label: hello@cogitave.com, href: "mailto:hello@cogitave.com" }
+        - { label: cogitave.com, href: "https://cogitave.com/" }
+        - { label: github.com/cogitave/namzu, href: "https://github.com/cogitave/namzu" }
+        - { label: Kocaeli · TR }

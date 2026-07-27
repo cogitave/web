@@ -1,0 +1,264 @@
+### YamlMime:Page
+# The cogitave.com homepage, English (the unprefixed default locale, ADR-0003).
+# The Turkish sibling is index.tr.page.yaml and shares this UID.
+#
+# Two rules this document obeys and a reviewer should check:
+#   1. No price appears here. The service-catalog block carries copy keyed by
+#      offer id; the amounts come from corp/gtm/pricing/services-catalog.yaml.
+#   2. Every quantitative product claim carries its `evidence` link. A stat
+#      without one does not render (see components/product-grid).
+uid: cogitave.web.page.home
+title: Cogitave — AI for agents
+description: Cogitave is an AI studio building the agent stack from scratch — yuva, the agent operating system; namzu, the open-source agent kernel; and cogi, the orchestrator agent — plus the services that put them into production.
+locale: en
+seo:
+  metaTitle: Cogitave | AI for agents
+  metaDescription: The agent operating system yuva, the open-source kernel namzu, and the orchestrator agent cogi. Generative AI development, GPU model hosting, industrial IoT and security engineering, from a Kocaeli-based studio in Türkiye.
+  ogImage: /assets/brand/og.png
+  structuredData:
+    - organization
+blocks:
+  - type: hero
+    id: top
+    data:
+      # The headline types itself through these in sequence. Under
+      # prefers-reduced-motion the first line renders statically — the phrases
+      # are content, so the motion never carries meaning the text does not.
+      ariaLabel: Cogitave — an AI research studio
+      phrases:
+        - research-led artificial intelligence.
+        - building the future with intelligence.
+        - foundation models, on the production line.
+        - agents on shift while people sleep.
+        - from idea to production, in one flow.
+        - we build systems that think.
+
+  - type: service-catalog
+    id: services
+    data:
+      label: Services
+      # Prices, durations and engagement types are NOT here. Each entry names an
+      # id from corp/gtm/pricing/services-catalog.yaml; the component joins the
+      # copy below to the registry figure at build time.
+      source: corp/gtm/pricing/services-catalog.yaml
+      quoteLabel: Talk to us
+      contact: hello@cogitave.com
+      categories:
+        - id: genai
+          title: Generative AI development
+          offers:
+            - id: genai-discovery
+              title: Discovery sprint
+              summary: Scenarios, feasibility and the target architecture.
+            - id: genai-pilot
+              title: Pilot product
+              summary: A production-ready MVP with retrieval.
+            - id: genai-scale
+              title: Scale programme
+              summary: Enterprise rollout with an embedded team.
+        - id: agents
+          title: Autonomous agent systems
+          offers:
+            - id: agents-poc
+              title: Agent proof of concept
+              summary: One workflow, end to end, to a go/no-go decision.
+            - id: agents-prod
+              title: Production agent
+              summary: Supported rollout with monitoring and approval gates.
+            - id: agents-platform
+              title: Agent platform
+              summary: Multi-agent orchestration on yuva.
+        - id: hosting
+          title: Model hosting
+          badge: New
+          offers:
+            - id: hosting-starter
+              title: Starter
+              summary: Shared GPU with a scale-to-zero API.
+            - id: hosting-pro
+              title: Pro
+              summary: Dedicated GPU (L4/A10G) with autoscaling.
+            - id: hosting-enterprise
+              title: Enterprise
+              summary: Dedicated cluster, in your VPC or on your own hardware.
+        - id: iot
+          title: Industrial IoT and edge
+          offers:
+            - id: iot-survey
+              title: Site survey
+              summary: OT/IT assessment and a pilot plan.
+            - id: iot-pilot
+              title: Pilot line
+              summary: Edge-autonomous install on one site, with telemetry.
+            - id: iot-fleet
+              title: Fleet scale
+              summary: Multi-site rollout with compliance reporting.
+        - id: infra
+          title: Data and infrastructure engineering
+          offers:
+            - id: infra-audit
+              title: Architecture audit
+              summary: Infrastructure and cost review, delivered as a report.
+            - id: infra-sprint
+              title: Platform sprint
+              summary: Multi-cloud IaC, data pipeline and vector infrastructure.
+            - id: infra-retainer
+              title: Continuous engineering
+              summary: Monthly capacity for MLOps and on-call support.
+        - id: security
+          title: Security and compliance
+          offers:
+            - id: security-assess
+              title: Security assessment
+              summary: Zero-trust gap analysis with a findings report.
+            - id: security-program
+              title: Compliance programme
+              summary: Controls-as-code (OSCAL/OPA) producing audit evidence.
+            - id: security-monitoring
+              title: Continuous monitoring
+              summary: Managed security operations.
+        - id: consulting
+          title: Consulting and training
+          offers:
+            - id: consulting-session
+              title: Strategy session
+              summary: An executive-level map of where the opportunity is.
+            - id: consulting-roadmap
+              title: Technical roadmap
+              summary: Architecture decisions and the budget to match.
+            - id: consulting-training
+              title: Team workshop
+              summary: Hands-on, built around your own product.
+
+  - type: product-grid
+    id: products
+    data:
+      label: Our products
+      products:
+        - id: yuva
+          category: Agent operating system
+          name: yuva
+          slogan: Not for humans. Only for agents.
+          body: >-
+            The operating layer where agents are scheduled, authorized and
+            observed. Resource, identity and permission in one system.
+          stat:
+            # Quoted per yuva/docs/BENCHMARKS.md §6, which forbids a bare
+            # marketing multiplier. This is the axis-A figure: the SAME
+            # byte-identical nano-guest under both VMMs on the same runner —
+            # the only apples-to-apples comparison the benchmark supports.
+            value: 11.1x
+            label: faster to first instruction than Firecracker, same guest, same host
+            evidence:
+              href: https://github.com/cogitave/yuva/blob/main/docs/BENCHMARKS.md
+              label: Methodology and measured figures
+          features:
+            - Agent lifecycle and scheduling
+            - Identity and capability model
+            - End-to-end observability
+            - Runs on bare metal or as a KVM guest
+          tag: Open source
+        - id: namzu
+          category: Agent kernel
+          name: namzu
+          slogan: The same kernel under every agent.
+          body: >-
+            An open-source agent kernel. Full control stays with you: it installs
+            into an enterprise without an external dependency, and adapts to it.
+            Put your own interface on top and run.
+          stat:
+            value: "0"
+            label: runtime dependencies in the SDK and sandbox packages
+            evidence:
+              href: https://github.com/cogitave/namzu
+              label: Verify in the package manifests
+          features:
+            - Control at the kernel level
+            - Adaptable and customizable for enterprise
+            - Slots under any interface
+          tag: Open source
+        - id: cogi
+          category: Orchestrator agent
+          name: cogi
+          slogan: The agent that knows your company.
+          body: >-
+            A fully autonomous orchestrator: it learns your company from how you
+            use it, trains its own adapter and distils its own model.
+          stat:
+            value: ∞
+            label: it keeps training its own model as you use it
+            # cogi is not shipped, so this is a statement of intent, not a
+            # measurement. Flagged rather than given a link that would imply one.
+            qualitative: true
+          features:
+            - Fully autonomous orchestration
+            - Derives its own adapter from usage
+            - Distils and deploys its own model
+          tag: Coming soon
+
+  - type: research-list
+    id: research
+    data:
+      label: Research
+      moreLabel: Every article, soon — learn.cogitave.com
+      moreHref: https://learn.cogitave.com
+      articles:
+        - date: 2026-07
+          tag: Agents
+          title: The agent that trains its own adapter — cogi's autonomous learning loop
+          excerpt: An orchestrator that learns continuously from usage data: the distillation pipeline, the evaluation gates and a safe rollout strategy.
+        - date: 2026-06
+          tag: Systems
+          title: Cold start in yuva — what a from-scratch kernel never pays for
+          excerpt: How we get to millisecond startup in an agent operating system, and the measurement methodology that keeps the numbers comparable.
+        - date: 2026-05
+          tag: Architecture
+          title: Why an agent kernel should have no dependencies
+          excerpt: namzu's design principles — the kernel is yours, the interface is yours, control is yours. Agent infrastructure without enterprise lock-in.
+        - date: 2026-04
+          tag: Industrial
+          title: Telemetry and data integrity across edge-autonomous fleets
+          excerpt: Field devices that keep working when the link drops: local decisions, queued sync and traceability patterns for industrial environments.
+
+  - type: org-list
+    id: organisation
+    data:
+      label: Organisation
+      orgs:
+        - name: cogitave
+          body: Core products — yuva, namzu, cogi
+        - name: cogitave-ai
+          body: Model ports, agent and plugin registry
+        - name: cogitave-cloud
+          body: Hosted services, API gateway
+        - name: cogitave-labs
+          body: R&D — editor and browser prototypes
+        - name: cogitave-services
+          body: Sector solutions, industrial IoT
+
+  - type: partner-strip
+    id: platforms
+    data:
+      # Deliberately NOT labelled "technology partners". A partner designation is
+      # earned status governed by corp/alliances; these are the clouds our
+      # multi-cloud IaC actually targets, which is a fact about our deployments,
+      # not a claim about a partner programme. See corp/alliances/README.md
+      # before any of these marks is relabelled.
+      label: Deploys to
+      platforms:
+        - { name: Amazon Web Services, logo: /assets/partners/aws.svg }
+        - { name: Microsoft Azure, logo: /assets/partners/azure.svg }
+        - { name: Oracle Cloud, logo: /assets/partners/oracle.svg }
+
+  - type: cta
+    id: contact
+    data:
+      headline: Let's talk about what you want to put into production
+      body: Tell us the problem and we will tell you whether an agent is the right answer.
+      cta: { label: Get in touch, href: "mailto:hello@cogitave.com" }
+      # Existing customers used to pay through a card form embedded in this page.
+      # Payment now lives on its own surface; the landing only links out. See
+      # docs/decisions/0004-payments-off-the-marketing-surface.md.
+      secondary:
+        label: Already a customer? Pay here
+        href: https://pay.cogitave.com/

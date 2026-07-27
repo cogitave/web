@@ -1,0 +1,240 @@
+### YamlMime:Page
+# The cogitave.com homepage, Turkish (served at /tr/, ADR-0003). Shares the UID
+# of index.page.yaml: same page, different locale — the structure is never
+# forked, only the copy. Identifiers, ids and comments stay English (AGENTS.md
+# rule 1 governs the repository); only visitor-facing strings are Turkish.
+uid: cogitave.web.page.home
+title: Cogitave — Ajanlar İçin Yapay Zekâ
+description: Cogitave, ajan yığınını sıfırdan inşa eden bir yapay zekâ stüdyosu — ajan işletim sistemi yuva, açık kaynak ajan çekirdeği namzu ve orkestratör ajan cogi; artı bunları üretime taşıyan hizmetler.
+locale: tr
+seo:
+  metaTitle: Cogitave | Ajanlar İçin Yapay Zekâ
+  metaDescription: Ajan işletim sistemi yuva, açık kaynak çekirdek namzu ve orkestratör ajan cogi. Üretken yapay zekâ geliştirme, GPU model barındırma, endüstriyel IoT ve güvenlik mühendisliği — Kocaeli merkezli bir stüdyodan.
+  ogImage: /assets/brand/og.png
+  structuredData:
+    - organization
+blocks:
+  - type: hero
+    id: top
+    data:
+      ariaLabel: Cogitave — yapay zekâ araştırma stüdyosu
+      phrases:
+        - araştırmayla ilerleyen yapay zekâ.
+        - geleceği zekâyla inşa ediyoruz.
+        - temel modeller, üretim hattında.
+        - ajanlar devrede, insanlar uyurken.
+        - fikirden üretime, tek akışta.
+        - düşünen sistemler inşa ediyoruz.
+
+  - type: service-catalog
+    id: services
+    data:
+      label: Hizmetler
+      source: corp/gtm/pricing/services-catalog.yaml
+      quoteLabel: Teklif alın
+      contact: hello@cogitave.com
+      categories:
+        - id: genai
+          title: Üretken Yapay Zekâ Geliştirme
+          offers:
+            - id: genai-discovery
+              title: Keşif Sprint'i
+              summary: Senaryolar, fizibilite ve hedef mimari.
+            - id: genai-pilot
+              title: Pilot Ürün
+              summary: Erişimli üretime hazır MVP.
+            - id: genai-scale
+              title: Ölçekleme Programı
+              summary: Gömülü ekiple kurumsal yaygınlaştırma.
+        - id: agents
+          title: Otonom Ajan Sistemleri
+          offers:
+            - id: agents-poc
+              title: Ajan PoC
+              summary: Uçtan uca tek akış, go/no-go kararına kadar.
+            - id: agents-prod
+              title: Üretim Ajanı
+              summary: İzleme ve onay kapılarıyla destekli dağıtım.
+            - id: agents-platform
+              title: Ajan Platformu
+              summary: yuva üzerinde çoklu ajan orkestrasyonu.
+        - id: hosting
+          title: Model Barındırma
+          badge: Yeni
+          offers:
+            - id: hosting-starter
+              title: Starter
+              summary: Scale-to-zero API'li paylaşımlı GPU.
+            - id: hosting-pro
+              title: Pro
+              summary: Otomatik ölçeklemeli özel GPU (L4/A10G).
+            - id: hosting-enterprise
+              title: Enterprise
+              summary: Kendi VPC'nizde ya da kendi donanımınızda özel küme.
+        - id: iot
+          title: Endüstriyel IoT ve Edge
+          offers:
+            - id: iot-survey
+              title: Saha Keşfi
+              summary: OT/IT değerlendirmesi ve pilot planı.
+            - id: iot-pilot
+              title: Pilot Hat
+              summary: Tek tesiste telemetrili edge-otonom kurulum.
+            - id: iot-fleet
+              title: Filo Ölçeği
+              summary: Uyum raporlamalı çok tesisli dağıtım.
+        - id: infra
+          title: Veri ve Altyapı Mühendisliği
+          offers:
+            - id: infra-audit
+              title: Mimari Denetim
+              summary: Rapor olarak teslim edilen altyapı ve maliyet incelemesi.
+            - id: infra-sprint
+              title: Platform Sprint'i
+              summary: Multi-cloud IaC, veri hattı ve vektör altyapısı.
+            - id: infra-retainer
+              title: Sürekli Mühendislik
+              summary: MLOps ve nöbetçi destek için aylık kapasite.
+        - id: security
+          title: Güvenlik ve Uyumluluk
+          offers:
+            - id: security-assess
+              title: Güvenlik Değerlendirmesi
+              summary: Bulgu raporlu zero-trust boşluk analizi.
+            - id: security-program
+              title: Uyum Programı
+              summary: Denetim kanıtı üreten controls-as-code (OSCAL/OPA).
+            - id: security-monitoring
+              title: Sürekli İzleme
+              summary: Yönetilen güvenlik operasyonları.
+        - id: consulting
+          title: Danışmanlık ve Eğitim
+          offers:
+            - id: consulting-session
+              title: Strateji Oturumu
+              summary: Fırsatın nerede olduğunu gösteren yönetici seviyesi harita.
+            - id: consulting-roadmap
+              title: Teknik Yol Haritası
+              summary: Mimari kararlar ve bunlara uygun bütçe.
+            - id: consulting-training
+              title: Ekip Atölyesi
+              summary: Kendi ürününüz üzerinden, uygulamalı.
+
+  - type: product-grid
+    id: products
+    data:
+      label: Ürünlerimiz
+      products:
+        - id: yuva
+          category: Ajan İşletim Sistemi
+          name: yuva
+          slogan: İnsanlar için değil, yalnızca ajanlar için.
+          body: >-
+            Ajanların planlandığı, yetkilendirildiği ve gözlemlendiği işletim
+            katmanı. Kaynak, kimlik ve yetki tek sistemde.
+          stat:
+            value: 11,1×
+            label: aynı konuk, aynı makinede Firecracker'a göre ilk komuta bu kadar hızlı ulaşır
+            evidence:
+              href: https://github.com/cogitave/yuva/blob/main/docs/BENCHMARKS.md
+              label: Yöntem ve ölçülen değerler
+          features:
+            - Ajan yaşam döngüsü ve zamanlama
+            - Kimlik ve yetki modeli
+            - Uçtan uca gözlemlenebilirlik
+            - Çıplak donanımda veya KVM konuğu olarak çalışır
+          tag: Açık kaynak
+        - id: namzu
+          category: Ajan Çekirdeği
+          name: namzu
+          slogan: Her ajanın altında aynı çekirdek.
+          body: >-
+            Açık kaynak ajan çekirdeği. Tam kontrol sizde: dış bağımlılık olmadan
+            kurumsala kurulur ve uyarlanır. Üzerine kendi arayüzünüzü koyun,
+            çalışsın.
+          stat:
+            value: "0"
+            label: SDK ve sandbox paketlerinde çalışma zamanı bağımlılığı
+            evidence:
+              href: https://github.com/cogitave/namzu
+              label: Paket manifestlerinden doğrulayın
+          features:
+            - Çekirdek seviyesinde kontrol
+            - Kurumsala uyarlanabilir ve özelleştirilebilir
+            - Her arayüzün altına takılır
+          tag: Açık kaynak
+        - id: cogi
+          category: Orkestratör Ajan
+          name: cogi
+          slogan: Şirketinizi tanıyan ajan.
+          body: >-
+            Tam otonom orkestratör: şirketinizi kullanımınızdan öğrenir, kendi
+            adaptörünü eğitir ve kendi modelini damıtır.
+          stat:
+            value: ∞
+            label: siz kullandıkça kendi modelini eğitmeye devam eder
+            qualitative: true
+          features:
+            - Tam otonom orkestrasyon
+            - Kullanımdan kendi adaptörünü çıkarır
+            - Kendi modelini damıtır ve dağıtır
+          tag: Yakında
+
+  - type: research-list
+    id: research
+    data:
+      label: Araştırma
+      moreLabel: Tüm yazılar yakında — learn.cogitave.com
+      moreHref: https://learn.cogitave.com
+      articles:
+        - date: 2026-07
+          tag: Ajanlar
+          title: Kendi adaptörünü eğiten ajan — cogi'nin otonom öğrenme döngüsü
+          excerpt: Kullanım verisinden sürekli öğrenen bir orkestratör: damıtma hattı, değerlendirme kapıları ve güvenli dağıtım stratejisi.
+        - date: 2026-06
+          tag: Sistemler
+          title: yuva'da soğuk başlatma — sıfırdan yazılmış bir çekirdeğin hiç ödemediği bedel
+          excerpt: Ajan işletim sisteminde milisaniyelik başlatmaya nasıl ulaştığımız ve rakamları kıyaslanabilir tutan ölçüm yöntemi.
+        - date: 2026-05
+          tag: Mimari
+          title: Bir ajan çekirdeği neden bağımlılıksız olmalı?
+          excerpt: namzu'nun tasarım ilkeleri — çekirdek sizde, arayüz sizin, kontrol sizde. Kurumsalda lock-in olmadan ajan altyapısı.
+        - date: 2026-04
+          tag: Endüstriyel
+          title: Edge-otonom filolarda telemetri ve veri bütünlüğü
+          excerpt: Bağlantı koptuğunda da çalışan saha cihazları: yerel karar, kuyruklu senkron ve endüstriyel ortamda izlenebilirlik desenleri.
+
+  - type: org-list
+    id: organisation
+    data:
+      label: Organizasyon
+      orgs:
+        - name: cogitave
+          body: Çekirdek ürünler — yuva, namzu, cogi
+        - name: cogitave-ai
+          body: Model portları, ajan ve eklenti kayıt sistemi
+        - name: cogitave-cloud
+          body: Barındırılan servisler, API gateway
+        - name: cogitave-labs
+          body: Ar-Ge — editör ve tarayıcı prototipleri
+        - name: cogitave-services
+          body: Sektörel çözümler, endüstriyel IoT
+
+  - type: partner-strip
+    id: platforms
+    data:
+      label: Dağıtım hedeflerimiz
+      platforms:
+        - { name: Amazon Web Services, logo: /assets/partners/aws.svg }
+        - { name: Microsoft Azure, logo: /assets/partners/azure.svg }
+        - { name: Oracle Cloud, logo: /assets/partners/oracle.svg }
+
+  - type: cta
+    id: contact
+    data:
+      headline: Üretime almak istediğiniz şeyi konuşalım
+      body: Problemi anlatın, ajanın doğru cevap olup olmadığını söyleyelim.
+      cta: { label: İletişime geçin, href: "mailto:hello@cogitave.com" }
+      secondary:
+        label: Zaten müşterimiz misiniz? Ödemenizi buradan yapın
+        href: https://pay.cogitave.com/

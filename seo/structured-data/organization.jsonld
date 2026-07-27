@@ -3,21 +3,34 @@
   "@type": "Organization",
   "@id": "https://cogitave.com/#organization",
   "name": "Cogitave",
+  "legalName": "Cogitave Yazılım ve Danışmanlık Ltd. Şti.",
   "url": "https://cogitave.com",
+  "logo": "https://cogitave.com/assets/brand/favicon.svg",
+  "email": "hello@cogitave.com",
   "description": "Cogitave builds the foundational, AI-native platform that agents run on — an Agent Operating System (yuva) and an Agent Kernel (namzu) — from scratch, vertically integrated, in the open.",
   "slogan": "The operating system and kernel for agents.",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Kocaeli",
+    "addressCountry": "TR"
+  },
   "sameAs": [
     "https://github.com/cogitave"
   ],
   "knowsAbout": [
     "Agent operating systems",
     "AI agents",
-    "Model Context Protocol"
+    "Model Context Protocol",
+    "Model hosting",
+    "Industrial IoT",
+    "MLOps",
+    "Security engineering"
   ],
   "subjectOf": {
     "@type": "WebSite",
     "@id": "https://cogitave.com/#website",
     "url": "https://cogitave.com",
-    "name": "Cogitave"
+    "name": "Cogitave",
+    "inLanguage": ["en", "tr"]
   }
 }

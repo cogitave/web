@@ -96,12 +96,38 @@ apps:
     exclude: ["apps/_template/**"]
   registry:
     - id: corporate-landing
-      manifest: apps/corporate-landing/app.manifest.json   # author this app to ship the homepage
+      manifest: apps/corporate-landing/app.manifest.json   # the homepage
       route: "/"
       property: marketing-site
-      status: planned                   # planned | staged | live | archived
+      status: staged                    # planned | staged | live | archived
+      # staged, not live: three content gates are still open before this ships —
+      # the published prices must project from the corp/gtm pricing registry, the
+      # quantitative product claims must carry their benchmark attribution
+      # (yuva/docs/BENCHMARKS.md), and the partner logo strip needs the alliances
+      # /trademark check. Payment collection is NOT part of this app; see the
+      # payments property below.
+    - id: namzu-solutions
+      manifest: apps/namzu-solutions/app.manifest.json
+      route: /namzu
+      property: marketing-site
+      status: staged
+      # The customer presentation, ported out of a standalone HTML file into the
+      # content model. Its old URL redirects here (see `redirects` below).
     # Drop new campaigns/landing pages here, e.g.:
     # - { id: launch-yuva-2, manifest: apps/launch-yuva-2/app.manifest.json, route: /yuva-2, property: marketing-site, status: staged }
+
+# --- Redirects --------------------------------------------------------------
+# A URL we have published is a promise. When a page moves, the old address keeps
+# working rather than becoming a 404 in someone's email or slide deck.
+# The build emits a canonical + meta-refresh stub per entry so redirects work on
+# any static host; a host that supports real 301s should serve these as 301s.
+redirects:
+  - from: /namzu-otonom-ajan-cozumleri
+    to: /namzu/
+    reason: "The presentation moved into the app model; the old path was Turkish-named and served the Turkish deck."
+  - from: /namzu-otonom-ajan-cozumleri.html
+    to: /namzu/
+    reason: "The same page as served directly from the old static file."
 
 # --- Shared concerns (defaults inherited by every app; an app may override) --
 content:
@@ -118,9 +144,21 @@ analytics:
   provider: privacy-first              # cookieless by default; no PII; see analytics/README.md
   consent: analytics/consent.config.json
 i18n:
-  defaultLocale: en
-  locales: [en]                        # English-only today; structure is locale-ready
-  strategy: sub-path                   # /<locale>/... when locales > 1
+  # Locale handling is fixed by docs/decisions/0003-locale-routing.md. Read it
+  # before changing anything here; each field below is a decided constraint.
+  strategy: single-url                 # ONE endpoint per page. There is no /tr/ or
+                                       # /en/ segment and no locale route: every
+                                       # locale ships inside the same document and
+                                       # the switcher toggles which one is shown.
+  primaryLocale: tr                    # paints first; also the document's `lang`
+  locales: [tr, en]                    # authored order = display order in the switcher
+  autoRedirect: false                  # never redirect or swap content on
+                                       # Accept-Language, IP or cookie - the URL a
+                                       # visitor requested is the URL they get
+  persistChoice: localStorage          # the visitor's pick is remembered, not guessed
+  canonical: self                      # one URL per page, canonical for itself
+  # No hreflang: hreflang describes a set of ALTERNATE URLs, and there is only one
+  # URL per page here. Emitting it would be a claim about routes that do not exist.
 a11y:
   standard: WCAG-2.2-AA
   notes: a11y/README.md

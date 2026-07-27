@@ -1,0 +1,487 @@
+### YamlMime:Page
+# The namzu solutions deck, Turkish (served at /tr/namzu). Shares the UID of
+# index.page.yaml — the same slides, the other language. Turkish is the language
+# the deck was originally written in; the English sibling is its pair, and both
+# came from the same source file, which carried the two side by side.
+uid: cogitave.web.page.namzu-solutions
+title: namzu ile Otonom Ajan Çözümleri
+description: Süreçlerinizi namzu ile otonom yürütün, kontrol sizde kalsın — sandbox izolasyonu, bütçe kapıları, insan onaylı akışlar ve denetim izi; artı çevresindeki danışmanlık ve kurumsal sistem işi.
+locale: tr
+seo:
+  metaTitle: Cogitave · namzu ile Otonom Ajan Çözümleri
+  metaDescription: Süreçleriniz kendini yürütsün; kontrol sizde kalsın. Açık kaynak ajan çekirdeği namzu'nun 18 bölümlük anlatımı — izolasyon, bütçe, bellek, denetim — ve çevresindeki danışmanlık, kurumsal sistem ve altyapı işi.
+  ogImage: /assets/brand/og-namzu.png
+  structuredData:
+    - organization
+blocks:
+  - type: deck-slide
+    id: cover
+    data:
+      variant: cover
+      kicker: Otonom ajan çözümleri · namzu
+      title: Süreçleriniz kendini yürütsün; kontrol sizde kalsın.
+      lead: Operasyon, destek ve veri işleriniz size ait ajanlara devredilir — dilediğiniz dil modeliyle, bulutta ya da tamamen yerelde.
+      flow:
+        - { label: İş süreçleriniz, detail: Operasyon · destek · veri }
+        - { label: Size özel ajanlar, detail: İzolasyon · bütçe · bellek · denetim }
+        - { label: namzu, detail: Altındaki ajan çekirdeği }
+        - { label: Dilediğiniz dil modeli, detail: Bulut veya tamamen yerel · Ollama · LM Studio }
+
+  - type: deck-slide
+    id: opportunity
+    data:
+      kicker: Fırsat
+      title: Yapay zekâ daha fazlasını yapabilir.
+      lead: >-
+        Yapay zekâ artık yalnızca yanıt vermiyor; süreç yürütüyor. Fark, kullananla
+        değer üretenin arasında; ve doğru çekirdek, doğru kurguyla başlıyor.
+      stats:
+        - value: "%78"
+          label: kurum yapay zekâyı en az bir fonksiyonda kullanıyor
+          source: { cite: "McKinsey, Global Survey on AI" }
+        - value: "%40+"
+          label: agentic projenin 2027 sonuna kadar iptal edilmesi öngörülüyor
+          source: { cite: Gartner }
+        - value: "%95"
+          label: üretken yapay zekâ pilotu ölçülebilir getiri üretemiyor
+          source: { cite: MIT }
+      cards:
+        - marker: A
+          title: Pilotta kalan projeler
+          body: >-
+            Dalga ise büyüyor: Deloitte, 2027'de GenAI kullanan şirketlerin
+            yarısının ajan pilotu çalıştıracağını öngörüyor. Rekabet, pilotu
+            geçebilenlerin olacak.
+        - marker: B
+          title: Tekrarlayan manuel iş
+          body: >-
+            Ekiplerin zamanı veri girişi, belge kontrolü ve sistemler arası
+            kopyala-yapıştır ile tükeniyor. Asana'nın araştırmasına göre çalışma
+            gününün %58'i asıl işe değil, "iş hakkındaki işe" gidiyor.
+        - marker: C
+          title: Kontrolsüz araç yığını
+          body: >-
+            Her ekip ayrı bir yapay zekâ aracı deniyor; tek güvenlik modeli yok.
+            IBM'e göre veri ihlallerinin %20'sinde izinsiz "gölge YZ" var ve ihlal
+            başına ortalama 670 bin dolar ek maliyet yazıyor.
+
+  - type: deck-slide
+    id: stack
+    data:
+      kicker: Çözümlerimiz · Cogitave
+      title: Ajan altyapısını temelinden inşa eden ekip.
+      lead: >-
+        Piyasa, hazır modelin üzerine kapak geçirilmiş araçlarla dolu. Biz başka
+        bir noktaya odaklandık: ajanların üzerinde koştuğu altyapının kendisini,
+        mühendislik disipliniyle ve açık standartlarla inşa ediyoruz.
+      cards:
+        - marker: 01 / Ajan işletim sistemi
+          title: yuva
+          body: >-
+            Ajanların planlandığı, yetkilendirildiği ve gözlemlendiği işletim
+            katmanı. Çıplak donanımda ya da KVM üzerinde konuk olarak çalışır.
+            Kritik çekirdek bileşenleri makine kanıtlı (Kani), bellek kayıtları
+            kurcalamaya karşı imzalı.
+          tag: Açık kaynak
+        - marker: 02 / Ajan çekirdeği
+          title: namzu
+          body: >-
+            Her ajanın altındaki açık kaynak çekirdek. İzolasyon, bütçe, kalıcı
+            bellek ve denetim izi; üstünde sizin arayüzünüz.
+          tag: Açık kaynak
+        - marker: 03 / Orkestratör ajan
+          title: cogi
+          body: >-
+            Şirketinizi kullanımınızdan öğrenen ve kendi modelini damıtan tam
+            otonom orkestratör.
+          tag: Yakında
+      stats:
+        - value: "11,1×"
+          label: Firecracker'a göre ilk komuta bu kadar hızlı ulaşır
+          body: >-
+            Aynı makinede, iki VMM altında byte-özdeş aynı konukla ölçüldü —
+            benchmark'ın desteklediği tek elmayla elma karşılaştırması budur.
+          source:
+            cite: yuva benchmark'ları, axis-A (aynı konuk, aynı makine)
+            href: https://github.com/cogitave/yuva/blob/main/docs/BENCHMARKS.md
+
+  - type: deck-slide
+    id: what-is-namzu
+    data:
+      kicker: namzu nedir?
+      title: Ajanlarınız için güvenli bir çekirdek.
+      lead: >-
+        Bir işletim sistemi çekirdeği bilgisayarınız için ne ise, namzu da yapay
+        zekâ ajanlarınız için odur: her ajanı izole eder, harcamasını sınırlar,
+        hafızasını yönetir ve yaptığı her işi kayıt altına alır. Büyük işleri
+        alt-ajanlara bölmek de çekirdeğin işidir; delegasyon, izolasyon ve bütçeyle
+        birlikte gelir.
+      cards:
+        - marker: "01"
+          title: İzolasyon
+          body: >-
+            Her ajan izole bir sandbox içinde çalışır; dosya ve ağ erişimi
+            varsayılan olarak kapalıdır. İzolasyon kademelidir — süreç, konteyner,
+            mikro-VM — ve mikro-VM katmanında tercih sizin: Firecracker ya da yuva.
+            Kademe değişir, ajan kodu değişmez.
+        - marker: "02"
+          title: Bütçe kontrolü
+          body: Token, maliyet, süre ve yineleme limitleri her çalıştırma için tanımlanır; sürpriz fatura yok.
+        - marker: "03"
+          title: Kalıcı bellek
+          body: >-
+            Ajanlar öğrendiklerini saklar, kesintide kaldığı yerden devam eder; her
+            adımda otomatik kontrol noktası alınır. Kontrol noktası deposu
+            takılabilirdir: dosyada ya da kendi veritabanınızda.
+        - marker: "04"
+          title: Denetim izi
+          body: >-
+            Her adım olay akışına yazılır; denetim ve raporlama bir proje değil,
+            normal çalışmanın yan ürünü olur.
+
+  - type: deck-slide
+    id: how-it-works
+    data:
+      kicker: Nasıl çalışır?
+      title: Tek çekirdek, uçtan uca akış.
+      lead: Arayüzünüz sizde kalır. Altında duran kısım bizim inşa ettiğimizdir.
+      flow:
+        - { label: Sizin arayüzünüz, detail: CLI · API · web · ERP }
+        - { label: namzu, detail: Planlama · bellek · bütçe }
+        - { label: Harness, detail: İzin listeli araçlar · doğrulama kapıları }
+        - { label: Sandbox, detail: Süreç · konteyner · mikro-VM }
+
+  - type: deck-slide
+    id: use-cases
+    data:
+      kicker: Kullanım alanları
+      title: namzu ile neler yapılabilir?
+      lead: >-
+        Aynı çekirdek, farklı işler: aşağıdaki her senaryo bugün kurulabilir ve
+        hepsi izolasyon, bütçe ve denetim iziyle birlikte gelir.
+      cards:
+        - marker: "01"
+          title: Belge ve arka ofis
+          body: >-
+            Fatura, sözleşme ve formlardan veri çıkarılır, doğrulanır, sistemlere
+            işlenir; evrak yığını kuyruğa değil kayda dönüşür.
+          tag: Operasyon
+        - marker: "02"
+          title: Masraf ve satın alma
+          body: >-
+            Masraf fişleri okunur, politikayla karşılaştırılır, istisnalar onaya
+            düşer; satın alma talepleri bütçe kontrolüyle ilerler.
+          tag: Finans
+        - marker: "03"
+          title: Destek ve triyaj
+          body: >-
+            Gelen talepler sınıflandırılır, yönlendirilir ve kendi bilgi
+            tabanınızdan yanıtlanır; muhakeme gereken yerde insana devredilir.
+          tag: Destek
+        - marker: "04"
+          title: Veri ve raporlama
+          body: >-
+            Tekrarlayan çıkarımlar, mutabakatlar ve raporlar zamanında çalışır;
+            her adım izlenebilir kalır.
+          tag: Veri
+
+  - type: deck-slide
+    id: example
+    data:
+      kicker: Bir örnek, uçtan uca
+      title: "Tanıdık bir dert: masraf girişi."
+      lead: >-
+        Muhasebenin ay sonu koşturması, bu küçük maliyetlerin toplamıdır. Bunlardan
+        birini devretmenin şekli şudur.
+      stats:
+        - value: 20 dk · 58 $
+          label: tek bir masraf raporunu işlemenin ortalama maliyeti
+          source: { cite: GBTA }
+        - value: "%19"
+          label: rapor hatalı çıkıyor ve her düzeltme 18 dakika daha alıyor
+          source: { cite: GBTA }
+      flow:
+        - { label: Fiş gelir, detail: Çalışan fotoğrafı iletir }
+        - { label: Ajan okur ve sınıflandırır, detail: Tutar · kategori · politika }
+        - { label: İstisnada insan onayı, detail: Yalnızca aykırı kalemler sorulur }
+        - { label: Kayıt ve rapor, detail: "Sisteme işlenir, izi kalır" }
+
+  - type: deck-slide
+    id: efficiency
+    data:
+      kicker: Verimlilik
+      title: Verimlilik artışı nereden gelir?
+      lead: >-
+        Kazanç yalnızca hızdan değil; işin kesintisiz, öngörülebilir maliyetle ve
+        kritik noktalarda insan onayına bağlı sürmesinden gelir.
+      stats:
+        - value: 7/24
+          label: Kesintisiz operasyon
+          body: Ajanlar mesai bilmez; işler gece de tatilde de ilerler.
+          qualitative: true
+        - value: "%100"
+          label: İzlenebilir eylem
+          body: Her adım olay akışına yazılır; denetim ve raporlama hazır gelir.
+          qualitative: true
+        - value: "0"
+          label: Varsayılan erişim
+          body: >-
+            Sandbox kapalı başlar. Dosya ve ağ izinleri tek tek, bilinçli açılır.
+          qualitative: true
+
+  - type: deck-slide
+    id: proven
+    data:
+      kicker: Kanıtlanmış verimlilik
+      title: Rakamlar bizden değil; araştırmalardan.
+      lead: >-
+        Yapay zekânın verimlilik etkisi artık anekdot değil; hakemli çalışmalar ve
+        büyük ölçekli saha deneyleriyle ölçüldü. Aşağıdaki her rakam, yayımlanmış
+        gerçek bir araştırmaya dayanır.
+      stats:
+        - value: "+%15"
+          label: Çağrı merkezi üretkenliği
+          body: Saatte çözülen görüşme; yeni personelde +%34. 5.172 temsilciyle saha deneyi.
+          source: { cite: "Stanford & MIT, hakemli (QJE, 2025)" }
+        - value: "+%26"
+          label: Geliştirici çıktısında artış
+          body: >-
+            Microsoft ve Accenture'da ~5.000 geliştiriciyle randomize saha
+            deneyleri: tamamlanan görev sayısı %26 arttı.
+          source: { cite: "Cui ve ark. (2024)" }
+        - value: 1 ≈ 2
+          label: Bir kişi + YZ, iki kişilik takıma denk
+          body: >-
+            776 P&G profesyoneliyle saha deneyi: YZ'li bireyler, YZ'siz takımların
+            performansına ulaştı.
+          source: { cite: "Harvard & Wharton (NBER, 2025)" }
+
+  - type: deck-slide
+    id: security
+    data:
+      kicker: Güvenlik ve uyum
+      title: Kurumsal güven, tasarımdan gelir.
+      lead: >-
+        IBM'in 2025 ihlal raporuna göre, yapay zekâ kaynaklı ihlal yaşayan
+        kurumların %97'sinde YZ erişim kontrolleri eksikti. namzu'da kontrol
+        sonradan eklenmez; varsayılandır.
+      cards:
+        - marker: A
+          title: Ajan kandırılırsa?
+          body: >-
+            OWASP'ın 1 numaralı LLM riski prompt injection'dır: ajanı kandırıp
+            yetkisini kötüye kullandırmak. namzu'da araçlar izin listelidir, her
+            sınırda girdi doğrulanır, kritik çıktı doğrulama kapısından geçer.
+        - marker: B
+          title: Ajan sapıtırsa?
+          body: >-
+            Sandbox varsayılan kapalıdır: dosya ve ağ erişimi tek tek, bilinçli
+            açılır. İzolasyon arka ucunu siz seçersiniz: ister yuva, ister
+            Firecracker.
+        - marker: C
+          title: Yetkisi taşarsa?
+          body: >-
+            En az yetki ilkesi: ajan yalnızca görev kapsamındaki araçları görür;
+            yıkıcı komutlar harness'ta tam engellidir; yüksek etkili adımlar insan
+            onayına düşer.
+
+  - type: deck-slide
+    id: transparency
+    data:
+      kicker: Şeffaflık ve güven
+      title: Kara kutu değil; uçtan uca açık.
+      lead: >-
+        Vercel AI SDK ve OpenAI Agents SDK gibi araçlar sizi kendi platformlarına
+        bağlar; izleme ve trafik onların bulutundan geçer. Kapalı kurumsal
+        ürünlerde ise kutunun içini denetleyemezsiniz bile. namzu tam tersidir.
+        Şeffaflık artık tercih de değil: AB Yapay Zekâ Yasası kademeli olarak
+        yürürlüğe giriyor, denetlenebilirlik yükümlülük hâline geliyor.
+      cards:
+        - marker: Kod
+          title: Uçtan uca açık kaynak
+          body: >-
+            Kurumunuzun çekirdeğinde ne çalıştığını bilmek hakkınızdır. namzu'nun
+            kaynak kodunun tamamı açıktır; ne çalıştırdığınızı istediğiniz an,
+            satır satır denetlersiniz.
+        - marker: Veri
+          title: Mesajlarınız toplanmaz
+          body: >-
+            SDK, kullanıcı mesajlarını ve logları bize göndermez; gizli telemetri
+            yoktur. Verileriniz kurumunuzun dışına çıkmaz.
+        - marker: Sektörler
+          title: Bankadan sahaya, her yerde
+          body: >-
+            Aynı kontrol modeli düzenlenmiş ve operasyonel ortamlar arasında
+            taşınır; çünkü bir dağıtımın değil, çekirdeğin özelliğidir.
+
+  - type: deck-slide
+    id: services
+    data:
+      kicker: Hizmet yelpazesi
+      title: Yalnızca ajan değil; sistemin tamamı.
+      lead: >-
+        Yapay zekâ yolculuğunun her adımında danışmanlık veriyoruz: stratejiden
+        mimariye, geleneksel kurumsal sistem danışmanlığından klasik yazılım ve
+        servisleştirme ihtiyaçlarına. İhtiyacınız hazır bir ürün değil, size göre
+        kurgulanmış bir sistemse; onu birlikte tasarlarız.
+      cards:
+        - marker: Danışmanlık
+          title: Uçtan uca akıl ortaklığı
+          body: >-
+            Strateji, mimari, model seçimi, veri ve güvenlik: kararların tamamında
+            satıcıdan bağımsız bir akıl ortağı.
+        - marker: Geliştirme
+          title: Geliştirme ajanlara devredilir
+          body: >-
+            Entegrasyon geliştirmeleri ajanlara devredilebilir; müşteriden dönen
+            hatalar önce ajan tarafından karşılanır, insan yalnızca onaylar.
+        - marker: Altyapı
+          title: Size özel altyapı çözümleri
+          body: >-
+            Kod olarak tanımlanır, sağlayıcıdan bağımsız kurulur ve nerede
+            çalışırsa çalışsın aynı disiplinle işletilir.
+
+  - type: deck-slide
+    id: enterprise-systems
+    data:
+      kicker: Kurumsal sistemler
+      title: Kurumsal sistemler, ana dilimiz.
+      lead: >-
+        Yıllarımız SAP ve Microsoft Dynamics projelerinde geçti: ERP'nin ve CRM'in
+        nasıl yaşadığını, nerede tıkandığını ve neye mal olduğunu sahadan biliyoruz.
+        Bu birikim, yapay zekâ katmanını mevcut sisteminize doğru yerden bağlar.
+        Ajan katmanı ERP'nizin yanına değil, içine konuşur.
+      cards:
+        - marker: 01 / Kurumsal çekirdek
+          title: SAP
+          body: >-
+            Süreç uyarlama, modül geliştirme ve entegrasyon. Ajan katmanı, mevcut
+            SAP yapınızı bozmadan doğru noktadan bağlanır.
+        - marker: 02 / Günlük operasyon
+          title: Dynamics NAV / Business Central
+          body: >-
+            Uyarlama, rapor ve eklenti geliştirme; günlük operasyonun aktığı
+            sistemde hız kazandırır.
+        - marker: 03 / Ölçek
+          title: Dynamics 365 F&O
+          body: Daha büyük yapılar için finans ve operasyon işi, aynı şekilde bağlanır.
+        - marker: 04 / Müşteri tarafı
+          title: CRM
+          body: Müşteri süreçleri aynı ajan katmanına bağlanır, yanına iliştirilmez.
+
+  - type: deck-slide
+    id: infrastructure
+    data:
+      kicker: Altyapı çözümleri
+      title: Size özel altyapı; sağlayıcıdan bağımsız.
+      lead: >-
+        Azure'da da AWS'te de aynı disiplin: altyapınızı kod olarak tanımlar,
+        sağlayıcıdan bağımsız kurarız. Bugün Azure'daysanız yarın AWS'e, ya da
+        ikisine birden; mimari sizi hiçbir buluta kilitlemez.
+      cards:
+        - marker: Multi-cloud
+          title: Azure · AWS · dilediğiniz
+          body: >-
+            Sağlayıcıyı iş ihtiyacı belirler; mimari her ikisinde de aynı kalır.
+            Yerinde (on-prem) kurulum da her zaman masada.
+        - marker: Filo
+          title: Filo yönetimi
+          body: >-
+            Yüzlerce cihaz ve ajan tek panelden: sürüm dağıtımı, sağlık takibi,
+            uzaktan müdahale. Saha kiosk'larından bulut ajanlarına aynı filo düzeni.
+        - marker: Ölçek
+          title: Dinamik ölçekleme
+          body: >-
+            Yük arttıkça kaynak otomatik büyür, boşta küçülür; kapasiteye değil
+            kullanıma ödersiniz. Ajan iş yükleri için ayarlanmış ölçekleme eğrileri.
+
+  - type: deck-slide
+    id: industrial
+    data:
+      kicker: Endüstriyel operasyon
+      title: "Fabrika sahası: tüm makineler, tek zemin."
+      lead: >-
+        Fabrikada işimiz masa başında değil, sahada başlar. Operatör iş akışları
+        için donanımı tasarlıyor, üretiyor ve kuruyoruz: makineler tek makineye
+        bağlanır, ajanlar süreç ve anomalileri izler; operasyon adım adım, kontrol
+        sizde kalarak devredilir.
+      stats:
+        - value: 1,4 trilyon $
+          label: plansız duruşların dünyanın en büyük 500 şirketine yıllık maliyeti
+          body: Gelirlerinin yaklaşık %11'i.
+          source: { cite: Siemens }
+      flow:
+        - { label: Saha makineleri, detail: Operatörün kullandığı ekipman }
+        - { label: Tek makine · edge, detail: Tüm ekipman tek noktaya bağlanır }
+        - { label: Ajanlar, detail: Süreç ve anomali takibi }
+        - { label: Operasyon, detail: Rapor · müdahale · kayıt }
+
+  - type: deck-slide
+    id: native
+    data:
+      kicker: Native geliştirme
+      title: Her cihaza, kendi dilinde.
+      lead: >-
+        Uygulamayı tek kod tabanına sıkıştıran çatılar kâğıt üstünde ucuzdur;
+        faturası sahada gelir. Airbnb iki yıllık yatırımın ardından 2018'de React
+        Native'i bıraktı; Dropbox 2019'da ortak kod tabanını "aynı kodu iki kez
+        yazmaktan daha pahalı" bularak terk etti. Biz o faturayı baştan keseriz.
+      cards:
+        - marker: iOS
+          title: Swift ve SwiftUI
+          body: >-
+            Apple ekosisteminde birinci sınıf vatandaş: yeni işletim sistemi
+            özellikleri çıktığı gün ürününüzde, arayüz platformun kendi
+            hissiyatında.
+        - marker: Android
+          title: Kotlin ve Compose
+          body: >-
+            Telefondan tablete, Android tabanlı kiosk'lara: kamera, NFC, BLE ve
+            seri porta doğrudan erişim; kısıtlı donanımda bile akıcı arayüz.
+        - marker: Web
+          title: Web, gerektiği yerde
+          body: >-
+            Erişim öncelikliyse doğru araç web'dir; onu da aynı disiplinle yazarız.
+            Seçimi ideoloji değil, cihazın ihtiyacı ve kullanım senaryosu belirler.
+
+  - type: deck-slide
+    id: how-we-work
+    data:
+      kicker: Çalışma modelimiz
+      title: Fikirden üretime, yanınızdayız.
+      lead: >-
+        Kapsam ne olursa olsun disiplin aynı: küçük başla, ölç, kanıtla, büyüt. Her
+        adımda masada çekirdeği yazan deneyimli ekip oturur.
+      cards:
+        - marker: 01 / Keşif
+          title: Strateji oturumu
+          body: >-
+            Süreçlerinizi birlikte inceler, otomasyon potansiyeli en yüksek işleri
+            ve başarı ölçütlerini belirleriz. İlk keşif görüşmesi ücretsizdir.
+        - marker: 02 / Pilot
+          title: Pilot proje
+          body: >-
+            Haftalar içinde, gerçek verinizle çalışan dar kapsamlı bir pilot
+            kurulur; devam kararı ölçülen sonuçlara göre birlikte verilir.
+        - marker: 03 / Üretim
+          title: Yaygınlaştırma ve işletme
+          body: >-
+            Kanıtlanan pilot; izleme, onay kapıları ve denetim iziyle üretime
+            alınır ve devredilip unutulmak yerine işletilmeye devam eder.
+
+  - type: deck-slide
+    id: contact
+    data:
+      variant: close
+      kicker: Tanışalım
+      title: Tanışmak için sabırsızlanıyoruz.
+      lead: >-
+        Bu işi tutkuyla yapıyoruz: çekirdekten donanıma, sahadan buluta. Sizin
+        süreçlerinizi dinlemek, doğru sistemi birlikte tasarlamak ve onu üretimde
+        çalışırken izlemek; bizim için işin en keyifli kısmı. Kapımız açık, kahve
+        hazır.
+      contact:
+        - { label: hello@cogitave.com, href: "mailto:hello@cogitave.com" }
+        - { label: cogitave.com, href: "https://cogitave.com/tr/" }
+        - { label: github.com/cogitave/namzu, href: "https://github.com/cogitave/namzu" }
+        - { label: Kocaeli · TR }

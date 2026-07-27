@@ -1,0 +1,35 @@
+# GENERATED - do not edit. Run `npm run sync:estate` in the estate.
+#
+# The PUBLIC projection of corp/gtm/pricing/services-catalog.yaml, which is
+# the canonical source and lives in a private repo. Only what the page
+# already shows crosses the boundary: offer id, pricing model, amount,
+# period. Engagement types, SLA profiles and internal notes deliberately do
+# not.
+#
+# Editing a price here does nothing durable: the next sync overwrites it,
+# and `npm run check` fails inside the estate the moment this file and the
+# registry disagree. Change the registry.
+
+currency: USD
+offers:
+  agents-platform: { model: quote }
+  agents-poc: { model: fixed-fee, amount: 12500 }
+  agents-prod: { model: fixed-fee, amount: 34000 }
+  consulting-roadmap: { model: fixed-fee, amount: 6800 }
+  consulting-session: { model: fixed-fee, amount: 1200 }
+  consulting-training: { model: fixed-fee, amount: 4500 }
+  genai-discovery: { model: fixed-fee, amount: 4900 }
+  genai-pilot: { model: fixed-fee, amount: 19500 }
+  genai-scale: { model: quote }
+  hosting-enterprise: { model: quote }
+  hosting-pro: { model: recurring, amount: 690, period: month }
+  hosting-starter: { model: recurring, amount: 149, period: month }
+  infra-audit: { model: fixed-fee, amount: 3900 }
+  infra-retainer: { model: recurring, amount: 5500, period: month }
+  infra-sprint: { model: fixed-fee, amount: 14500 }
+  iot-fleet: { model: quote }
+  iot-pilot: { model: fixed-fee, amount: 28000 }
+  iot-survey: { model: fixed-fee, amount: 6500 }
+  security-assess: { model: fixed-fee, amount: 7500 }
+  security-monitoring: { model: quote }
+  security-program: { model: fixed-fee, amount: 21000 }

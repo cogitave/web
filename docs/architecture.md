@@ -98,6 +98,36 @@ workloads), so static-first + edge-SSR-where-needed is both fast and portable.[^
   ciphertext), private key only in the deploy secret store — also keeps secrets
   out of AI agent context.[^env]
 
+## 5b. The build, as it actually exists
+
+[`tools/build.mjs`](../tools/build.mjs) reads `site.config.yaml`, discovers apps
+by manifest, validates every manifest and content document against the committed
+schemas, joins the pricing registry, and renders each app once per locale into
+`_site/`. [`tools/serve.mjs`](../tools/serve.mjs) is the dev server: it watches
+every input the build reads — including the design tokens and the pricing
+registry in other trees — rebuilds, and pushes a reload over Server-Sent Events.
+Both are Node >= 22 and the standard library only.
+
+`tools/lib/` holds what a build needs and we therefore wrote: a YAML subset
+parser, the DTCG token transform, a JSON Schema validator, the HTML emitter and
+the analytics client generator.
+
+Two of those deserve a note.
+
+- **The validator refuses schemas it cannot fully check.** `assertSupported`
+  walks a schema before use and throws on any keyword the validator does not
+  implement. A validator that silently skips a constraint is worse than none,
+  because the gate reports green while checking less than it claims.
+- **The YAML parser is duplicated with `cogitave/learn`, on purpose and with a
+  debt attached.** This one is a superset (it adds flow collections and folded
+  scalars, which the web content model uses and the learn corpus does not).
+  Reuse-first says one parser, and the right home is
+  [`cogitave/primitives`](../../primitives/README.md) — but each mirrored repo
+  has to stand alone on GitHub, so a cross-repo relative import is not available,
+  and primitives publishes no package yet. **Follow-up:** promote one parser into
+  primitives as a published package and have both repos consume it. Until then
+  the duplication is deliberate and recorded here rather than silent.
+
 ## 6. MCP-native & evidence
 
 Per the org standard, the build intermediates (manifest registry, content model,
