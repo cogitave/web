@@ -91,6 +91,44 @@ jobs:
           fi
           echo "credentials present"
 
+      # Resolve the target by the domain it must serve, not by a name someone
+      # typed. Deploying to a project name is how a deploy silently succeeds into
+      # an orphan project while the live site never changes - the name can be
+      # wrong and nothing says so. The domain cannot be wrong: either a project
+      # serves cogitave.com or none does, and the latter is worth failing on.
+      #
+      # CLOUDFLARE_PAGES_PROJECT stays as an explicit override for the
+      # first-ever deploy, before any project owns the domain.
+      - name: Resolve the Pages project that serves the site
+        id: project
+        env:
+          CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          OVERRIDE: ${{ vars.CLOUDFLARE_PAGES_PROJECT }}
+          SITE_DOMAIN: cogitave.com
+        run: |
+          set -euo pipefail
+
+          projects=$(curl -sS -f \
+            -H "Authorization: Bearer $CF_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/pages/projects?per_page=100")
+
+          # The project whose custom domains include the site domain.
+          name=$(printf '%s' "$projects" \
+            | jq -r --arg d "$SITE_DOMAIN" '[.result[] | select((.domains // []) | index($d)) | .name][0] // ""')
+
+          if [ -n "$name" ]; then
+            echo "resolved by domain: $SITE_DOMAIN is served by Pages project \"$name\""
+          elif [ -n "${OVERRIDE:-}" ] && printf '%s' "$projects" | jq -e --arg n "$OVERRIDE" '.result[] | select(.name == $n)' >/dev/null; then
+            name="$OVERRIDE"
+            echo "::warning::no Pages project serves $SITE_DOMAIN yet; falling back to CLOUDFLARE_PAGES_PROJECT=\"$name\". This deploy will publish to that project's *.pages.dev URL, and $SITE_DOMAIN will NOT change until the custom domain is attached to it."
+          else
+            echo "::error::no Pages project serves $SITE_DOMAIN, and CLOUDFLARE_PAGES_PROJECT ${OVERRIDE:+(\"$OVERRIDE\") }does not name an existing project. Attach the domain to a Pages project, or set the variable to a project that exists."
+            exit 1
+          fi
+
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+
       - name: Publish to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:
@@ -98,7 +136,7 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: >-
             pages deploy _site
-            --project-name=${{ vars.CLOUDFLARE_PAGES_PROJECT || 'cogitave-web' }}
+            --project-name=${{ steps.project.outputs.name }}
             --branch=main
             --commit-dirty=true
 
